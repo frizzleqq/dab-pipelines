@@ -1,0 +1,67 @@
+[project]
+name = "dab_pipelines"
+version = "0.0.1"
+description = "Databricks Asset Bundle using Spark Declarative Pipelines for ETL workloads"
+readme = "README.md"
+authors = [
+    { name = "Florian Fritz", email = "flo.fritz@protonmail.com" }
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    # Any dependencies for jobs and pipelines in this project can be added here
+    # See also https://docs.databricks.com/dev-tools/bundles/library-dependencies
+    #
+    # LIMITATION: for pipelines, dependencies are cached during development;
+    # add dependencies to the 'environment' section of your pipeline.yml file instead
+]
+
+[dependency-groups]
+dev = [
+    # https://docs.databricks.com/aws/en/dev-tools/databricks-connect/requirements#databricks-connect-versions
+    "databricks-connect>=17.0,<17.4",
+    "databricks-dlt",
+    "pytest",
+    "ruff",
+]
+
+[project.scripts]
+main = "dab_pipelines.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+include = [
+    "pyproject.toml",
+    "src/**/*.py",
+    "resources/**/*.py",
+    "tests/**/*.py",
+]
+
+[tool.ruff.format]
+exclude = [
+    "src/dab_pipelines_etl/explorations/**/*.py",
+]
+docstring-code-format = true
+
+[tool.ruff.lint]
+exclude = [
+    "src/dab_pipelines_etl/explorations/**/*.py",
+]
+select = [
+  "E", # pycodestyle
+  "W", # pycodestyle
+  "F", # Pyflakes
+  "I", # isort
+]
+ignore = [
+  "E501", # Line length is regulated by formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
