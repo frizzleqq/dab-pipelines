@@ -21,14 +21,10 @@ def generate_data(args):
     print(f"Generating synthetic data to: {output_path}")
 
     # Create generator with seed for reproducibility
-    seed = args.seed if hasattr(args, "seed") and args.seed is not None else 42
-    generator = SyntheticDataGenerator(seed=seed)
+    generator = SyntheticDataGenerator(seed=args.seed)
 
     # Generate machine data schemas
-    num_machines = args.num_machines if hasattr(args, "num_machines") else 10
-    num_readings = args.num_readings if hasattr(args, "num_readings") else 1000
-
-    schemas = create_machine_example_schemas(num_machines=num_machines, num_sensor_readings=num_readings)
+    schemas = create_machine_example_schemas(num_machines=args.num_machines, num_sensor_readings=args.num_readings)
 
     # Generate and save
     file_paths = generator.generate_and_save(schemas, output_path)
