@@ -231,13 +231,12 @@ class SyntheticDataGenerator:
             Mapping of dataset names to file paths.
         """
         output_path = Path(output_dir)
-        output_path.mkdir(parents=True, exist_ok=True)
 
         file_paths = {}
         for schema in schemas:
             data = self.generate_dataset(schema)
-            file_path = output_path / f"{schema.name}.json"
-
+            file_path = output_path / schema.name / f"{schema.name}.json"
+            file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=indent, ensure_ascii=False)
 

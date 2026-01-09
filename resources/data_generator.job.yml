@@ -25,7 +25,7 @@ resources:
             parameters:
               - "generate-data"
               - "--catalog"
-              - "{{var.catalog}}"
+              - "${var.catalog}"
               - "--schema"
               - "{{job.parameters.schema}}"
               - "--volume"

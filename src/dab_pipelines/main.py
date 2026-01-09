@@ -16,7 +16,7 @@ def generate_data(args):
         Command-line arguments containing catalog, schema, volume, and optional parameters.
     """
     # Construct the Unity Catalog Volumes path
-    output_path = Path(f"/Volumes/{args.catalog}/{args.schema}/{args.volume}/machine_data")
+    output_path = Path(f"/Volumes/{args.catalog}/{args.schema}/{args.volume}")
 
     print(f"Generating synthetic data to: {output_path}")
 
