@@ -85,11 +85,14 @@ class SyntheticDataGenerator:
     ----------
     seed : int | None
         Random seed for reproducibility.
+    timestamp : datetime | None
+        Optional datetime to append to filenames as suffix.
     """
 
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, timestamp: datetime | None = None) -> None:
         """Initialize the generator."""
         self.seed = seed
+        self.timestamp = timestamp
         if seed is not None:
             random.seed(seed)
         self.faker = Faker()
@@ -235,7 +238,13 @@ class SyntheticDataGenerator:
         file_paths = {}
         for schema in schemas:
             data = self.generate_dataset(schema)
-            file_path = output_path / schema.name / f"{schema.name}.json"
+            # Add timestamp suffix if provided
+            if self.timestamp:
+                timestamp_str = self.timestamp.strftime("%Y%m%d_%H%M%S")
+                filename = f"{schema.name}_{timestamp_str}.json"
+            else:
+                filename = f"{schema.name}.json"
+            file_path = output_path / schema.name / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=indent, ensure_ascii=False)

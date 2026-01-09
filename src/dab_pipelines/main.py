@@ -1,4 +1,5 @@
 import argparse
+from datetime import UTC, datetime
 from pathlib import Path
 
 from databricks.sdk.runtime import spark
@@ -21,7 +22,7 @@ def generate_data(args):
     print(f"Generating synthetic data to: {output_path}")
 
     # Create generator with seed for reproducibility
-    generator = SyntheticDataGenerator(seed=args.seed)
+    generator = SyntheticDataGenerator(seed=args.seed, timestamp=datetime.now(tz=UTC))
 
     # Generate machine data schemas
     schemas = create_machine_example_schemas(num_machines=args.num_machines, num_sensor_readings=args.num_readings)
