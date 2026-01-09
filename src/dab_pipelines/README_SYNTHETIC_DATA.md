@@ -42,7 +42,7 @@ schema = DatasetSchema(
 )
 
 # Generate and save
-generator.generate_and_save([schema], "fixtures/data")
+generator.generate_and_save([schema], "data_output/data")
 ```
 
 ### Machine Data Example
@@ -61,7 +61,7 @@ schemas = create_machine_example_schemas(
     num_sensor_readings=1000
 )
 
-generator.generate_and_save(schemas, "fixtures/synthetic_data")
+generator.generate_and_save(schemas, "data_output/synthetic_data")
 ```
 
 This generates two files:
@@ -185,7 +185,7 @@ orders_schema = DatasetSchema(
 
 # Generate both datasets
 generator = SyntheticDataGenerator(seed=42)
-generator.generate_and_save([customer_schema, orders_schema], "fixtures/data")
+generator.generate_and_save([customer_schema, orders_schema], "data_output/data")
 ```
 
 ## Available Faker Methods
@@ -213,8 +213,8 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder.getOrCreate()
 
 # Read JSON data
-machines_df = spark.read.json("fixtures/synthetic_data/machine_dim.json")
-sensors_df = spark.read.json("fixtures/synthetic_data/sensor_facts.json")
+machines_df = spark.read.json("data_output/synthetic_data/machine_dim.json")
+sensors_df = spark.read.json("data_output/synthetic_data/sensor_facts.json")
 
 # Join dimension and facts
 result = sensors_df.join(machines_df, on="machine_id", how="left")
@@ -228,7 +228,3 @@ Run tests for the generator:
 ```bash
 uv run pytest tests/test_synthetic_data_generator.py -v
 ```
-
-## Examples
-
-See [create_machine_example_schemas](../src/dab_pipelines/synthetic_data_generator.py) function for a complete example of generating related datasets with dimensions and facts.

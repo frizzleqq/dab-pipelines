@@ -6,6 +6,7 @@ This repo deploys a Databricks Asset Bundle.
 - `databricks.yml`: Databricks Asset Bundle configuration file
 * `src/`: Python source code
   * `src/dab_pipelines/`: Shared Python code for pipelines.
+    * `synthetic_data_generator.py`: Generate configurable synthetic test data
   * `src/dab_pipelines_etl/`: Spark Declarative Pipelines (DLT)
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
 * `tests/`: Unit tests for the shared Python code.

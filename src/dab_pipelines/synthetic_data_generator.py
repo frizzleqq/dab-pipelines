@@ -327,7 +327,7 @@ def main() -> None:
     schemas = create_machine_example_schemas(num_machines=10, num_sensor_readings=1000)
 
     # Save to fixtures directory
-    output_dir = Path(__file__).parent.parent.parent / "fixtures" / "synthetic_data"
+    output_dir = Path(__file__).parent.parent.parent / "data_output" / "synthetic_data"
     generator.generate_and_save(schemas, output_dir)
 
     print(f"\nSynthetic data generated successfully in: {output_dir}")
