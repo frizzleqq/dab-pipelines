@@ -3,10 +3,10 @@
 import json
 import tempfile
 
-from dab_pipelines.synthetic_data_generator import (
+from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator
+from dab_pipelines.synthetic_data_schemas import (
     DatasetSchema,
     FieldSchema,
-    SyntheticDataGenerator,
     create_machine_example_schemas,
 )
 
