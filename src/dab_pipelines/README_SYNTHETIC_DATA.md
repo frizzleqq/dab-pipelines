@@ -16,8 +16,8 @@ A flexible, schema-based synthetic test data generator for ETL pipelines.
 
 ```python
 from pathlib import Path
-from dab_pipelines.synthetic_data_generator import (
-    SyntheticDataGenerator,
+from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator
+from dab_pipelines.synthetic_data_schemas import (
     DatasetSchema,
     FieldSchema,
 )
@@ -50,10 +50,8 @@ generator.generate_and_save([schema], "data_output/data")
 Generate machine dimension and sensor facts data:
 
 ```python
-from dab_pipelines.synthetic_data_generator import (
-    SyntheticDataGenerator,
-    create_machine_example_schemas,
-)
+from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator
+from dab_pipelines.synthetic_data_schemas import create_machine_example_schemas
 
 generator = SyntheticDataGenerator(seed=42)
 schemas = create_machine_example_schemas(
