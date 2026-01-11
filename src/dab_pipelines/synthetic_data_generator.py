@@ -8,7 +8,7 @@ specify field names, types, and generation strategies.
 import json
 import random
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -198,7 +198,7 @@ def main() -> None:
     """Example usage of the synthetic data generator."""
 
     # Create generator with seed for reproducibility
-    generator = SyntheticDataGenerator(seed=42)
+    generator = SyntheticDataGenerator(seed=42, timestamp=datetime.now(tz=UTC))
 
     # Generate machine example data
     schemas = create_machine_example_schemas(num_machines=10, num_sensor_readings=1000)

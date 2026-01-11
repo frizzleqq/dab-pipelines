@@ -20,5 +20,6 @@ This repo deploys a Databricks Asset Bundle.
  
 ## Code Style
 - Numpy docstring
+- Google Python Style Guide
 - Include type hints
 - Prefer: `from pyspark.sql import functions as F, types as T`

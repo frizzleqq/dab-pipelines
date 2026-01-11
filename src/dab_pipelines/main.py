@@ -1,10 +1,9 @@
 import argparse
 from datetime import UTC, datetime
-from pathlib import Path
 
 from databricks.sdk.runtime import spark
 
-from dab_pipelines import taxis
+from dab_pipelines import databricks_utils, taxis
 from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator, create_machine_example_schemas
 
 
@@ -16,8 +15,12 @@ def generate_data(args):
     args : argparse.Namespace
         Command-line arguments containing catalog, schema, volume, and optional parameters.
     """
-    # Construct the Unity Catalog Volumes path
-    output_path = Path(f"/Volumes/{args.catalog}/{args.schema}/{args.volume}")
+    # Ensure the volume exists before writing data
+    output_path = databricks_utils.create_volume_if_not_exists(
+        catalog=args.catalog,
+        schema=args.schema,
+        volume_name=args.volume,
+    )
 
     print(f"Generating synthetic data to: {output_path}")
 
