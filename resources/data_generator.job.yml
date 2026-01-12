@@ -1,0 +1,47 @@
+# Data generator job for synthetic machine data
+
+resources:
+  jobs:
+    data_generator:
+      name: data_generator
+
+      parameters:
+        - name: schema
+          default: landing
+        - name: volume
+          default: machine_uploads
+        - name: num_machines
+          default: "10"
+        - name: num_readings
+          default: "1000"
+        - name: seed
+          default: "42"
+
+      tasks:
+        - task_key: generate_synthetic_data
+          python_wheel_task:
+            package_name: dab_pipelines
+            entry_point: main
+            parameters:
+              - "generate-data"
+              - "--catalog"
+              - "${var.catalog}"
+              - "--schema"
+              - "{{job.parameters.schema}}"
+              - "--volume"
+              - "{{job.parameters.volume}}"
+              - "--num-machines"
+              - "{{job.parameters.num_machines}}"
+              - "--num-readings"
+              - "{{job.parameters.num_readings}}"
+              - "--seed"
+              - "{{job.parameters.seed}}"
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              # Include the wheel file and dependencies
+              - ../dist/*.whl

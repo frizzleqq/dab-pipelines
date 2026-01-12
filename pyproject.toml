@@ -13,6 +13,7 @@ dependencies = [
     #
     # LIMITATION: for pipelines, dependencies are cached during development;
     # add dependencies to the 'environment' section of your pipeline.yml file instead
+    "faker>=33.0.0",
 ]
 
 [dependency-groups]
