@@ -6,6 +6,10 @@ from typing import Optional
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.catalog import VolumeType
 
+from dab_pipelines.logging_config import get_logger
+
+logger = get_logger(__name__)
+
 
 def create_volume_if_not_exists(
     catalog: str,
@@ -55,10 +59,10 @@ def create_volume_if_not_exists(
     try:
         # Check if volume exists
         workspace_client.volumes.read(full_volume_name)
-        print(f"Volume '{full_volume_name}' already exists.")
+        logger.info(f"Volume '{full_volume_name}' already exists.")
     except Exception:
         # Volume doesn't exist, create it
-        print(f"Creating volume '{full_volume_name}'...")
+        logger.info(f"Creating volume '{full_volume_name}'...")
 
         workspace_client.volumes.create(
             catalog_name=catalog,
@@ -68,7 +72,7 @@ def create_volume_if_not_exists(
             comment=comment,
         )
 
-        print(f"Successfully created volume '{full_volume_name}'.")
+        logger.info(f"Successfully created volume '{full_volume_name}'.")
 
     # Return the path to the volume
     return Path(f"/Volumes/{catalog}/{schema}/{volume_name}")

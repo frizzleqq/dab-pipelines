@@ -4,7 +4,10 @@ from datetime import UTC, datetime
 from databricks.sdk.runtime import spark
 
 from dab_pipelines import databricks_utils, taxis
+from dab_pipelines.logging_config import get_logger, setup_logging
 from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator, create_machine_example_schemas
+
+logger = get_logger(__name__)
 
 
 def generate_data(args):
@@ -22,7 +25,7 @@ def generate_data(args):
         volume_name=args.volume,
     )
 
-    print(f"Generating synthetic data to: {output_path}")
+    logger.info(f"Generating synthetic data to: {output_path}")
 
     # Create generator with seed for reproducibility
     generator = SyntheticDataGenerator(seed=args.seed, timestamp=datetime.now(tz=UTC))
@@ -33,9 +36,9 @@ def generate_data(args):
     # Generate and save
     file_paths = generator.generate_and_save(schemas, output_path)
 
-    print(f"\nSuccessfully generated {len(file_paths)} datasets:")
+    logger.info(f"Successfully generated {len(file_paths)} datasets:")
     for name, path in file_paths.items():
-        print(f"  - {name}: {path}")
+        logger.info(f"  - {name}: {path}")
 
 
 def run_job(args):
@@ -46,6 +49,8 @@ def run_job(args):
     args : argparse.Namespace
         Command-line arguments containing catalog and schema.
     """
+    logger.info(f"Running job with catalog={args.catalog}, schema={args.schema}")
+    
     # Set the default catalog and schema
     spark.sql(f"USE CATALOG {args.catalog}")
     spark.sql(f"USE SCHEMA {args.schema}")
@@ -59,6 +64,13 @@ def main():
     parser = argparse.ArgumentParser(
         description="Databricks pipeline utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    
+    # Add global verbose flag
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Enable verbose (DEBUG) logging"
     )
 
     # Create subparsers for different commands
@@ -88,6 +100,11 @@ def main():
 
     # Parse arguments
     args = parser.parse_args()
+    
+    # Initialize logging based on verbose flag
+    setup_logging(verbose=args.verbose)
+    logger.debug("Logging initialized in DEBUG mode")
+    logger.debug(f"Command-line arguments: {args}")
 
     # Execute the appropriate function based on subcommand
     if hasattr(args, "func"):
