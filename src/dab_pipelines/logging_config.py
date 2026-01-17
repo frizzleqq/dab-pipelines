@@ -11,6 +11,54 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from dab_pipelines import databricks_utils
+
+
+def create_log_directory(catalog: str, log_subdir: Optional[str] = None) -> Path:
+    """Create log directory in Unity Catalog Volume.
+
+    Creates the logs volume in the 'default' schema if it doesn't exist,
+    and returns the full path including any subdirectory.
+
+    Parameters
+    ----------
+    catalog : str
+        The Unity Catalog name.
+    log_subdir : str, optional
+        Subdirectory within the logs volume for organizing logs.
+
+    Returns
+    -------
+    Path
+        Full path to the log directory: /Volumes/{catalog}/default/logs/{log_subdir}
+
+    Examples
+    --------
+    >>> create_log_directory("main")
+    PosixPath('/Volumes/main/default/logs')
+    >>> create_log_directory("main", "data_generator")
+    PosixPath('/Volumes/main/default/logs/data_generator')
+    """
+    # Always use 'default' schema and 'logs' volume
+    schema = "default"
+    volume_name = "logs"
+
+    logger = get_logger(__name__)
+    logger.info(f"Ensuring logs volume exists: catalog={catalog}, schema={schema}, volume={volume_name}")
+
+    # Create the volume if it doesn't exist
+    volume_path = databricks_utils.create_volume_if_not_exists(
+        catalog=catalog,
+        schema=schema,
+        volume_name=volume_name,
+        comment="Volume for application logs",
+    )
+
+    # Append subdirectory if provided
+    if log_subdir:
+        return volume_path / log_subdir
+    return volume_path
+
 
 def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None:
     """Configure logging for the application.
@@ -32,7 +80,7 @@ def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None
     Examples
     --------
     >>> setup_logging(verbose=False)  # INFO and above to console
-    >>> setup_logging(verbose=True)   # DEBUG and above to console
+    >>> setup_logging(verbose=True)  # DEBUG and above to console
     >>> setup_logging(log_dir=Path("./logs"))  # Also write to file
     """
     # Determine log level based on verbose flag
@@ -65,16 +113,16 @@ def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None
     if log_dir:
         # Ensure the log directory exists
         log_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Create timestamped log filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         log_file = log_dir / f"dab_pipelines_{timestamp}.log"
-        
+
         # Create file handler
         file_handler = logging.FileHandler(log_file, encoding="utf-8")
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
-        
+
         # Add file handler to root logger
         root_logger.addHandler(file_handler)
 

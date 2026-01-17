@@ -129,7 +129,7 @@ class SyntheticDataGenerator:
             List of generated records.
         """
         logger.debug(f"Generating dataset '{schema.name}' with {schema.num_records} records")
-        
+
         # Track remaining values for unique reference fields
         unique_references = {}
         for field in schema.fields:
@@ -155,7 +155,7 @@ class SyntheticDataGenerator:
                 else:
                     record[field.name] = self._generate_value(field)
             records.append(record)
-        
+
         logger.debug(f"Successfully generated {len(records)} records for '{schema.name}'")
         return records
 
@@ -207,7 +207,7 @@ class SyntheticDataGenerator:
 def main() -> None:
     """Example usage of the synthetic data generator."""
     from dab_pipelines.logging_config import setup_logging
-    
+
     # Initialize logging for standalone execution
     setup_logging(verbose=False)
 

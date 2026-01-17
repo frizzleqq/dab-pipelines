@@ -3,11 +3,10 @@ from datetime import UTC, datetime
 
 from databricks.sdk.runtime import spark
 
-from dab_pipelines import databricks_utils, taxis
-from dab_pipelines.logging_config import get_logger, setup_logging
+from dab_pipelines import databricks_utils, logging_config, taxis
 from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator, create_machine_example_schemas
 
-logger = get_logger(__name__)
+logger = logging_config.get_logger(__name__)
 
 
 def generate_data(args):
@@ -18,6 +17,12 @@ def generate_data(args):
     args : argparse.Namespace
         Command-line arguments containing catalog, schema, volume, and optional parameters.
     """
+    # Create log directory if log_subdir is provided
+    if args.log_subdir:
+        log_dir = logging_config.create_log_directory(catalog=args.catalog, log_subdir=args.log_subdir)
+        logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
+        logger.info(f"Logging to directory: {log_dir}")
+
     # Ensure the volume exists before writing data
     output_path = databricks_utils.create_volume_if_not_exists(
         catalog=args.catalog,
@@ -49,8 +54,14 @@ def run_job(args):
     args : argparse.Namespace
         Command-line arguments containing catalog and schema.
     """
+    # Create log directory if log_subdir is provided
+    if args.log_subdir:
+        log_dir = logging_config.create_log_directory(catalog=args.catalog, log_subdir=args.log_subdir)
+        logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
+        logger.info(f"Logging to directory: {log_dir}")
+
     logger.info(f"Running job with catalog={args.catalog}, schema={args.schema}")
-    
+
     # Set the default catalog and schema
     spark.sql(f"USE CATALOG {args.catalog}")
     spark.sql(f"USE SCHEMA {args.schema}")
@@ -65,12 +76,15 @@ def main():
         description="Databricks pipeline utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    
+
     # Add global verbose flag
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose (DEBUG) logging")
+
+    # Add global log-subdir parameter
     parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="Enable verbose (DEBUG) logging"
+        "--log-subdir",
+        type=str,
+        help="Subdirectory within /Volumes/{catalog}/default/logs/ for log files (e.g., 'data_generator')",
     )
 
     # Create subparsers for different commands
@@ -100,9 +114,9 @@ def main():
 
     # Parse arguments
     args = parser.parse_args()
-    
-    # Initialize logging based on verbose flag
-    setup_logging(verbose=args.verbose)
+
+    # Initialize basic logging (commands will re-configure if --log-subdir is provided)
+    logging_config.setup_logging(verbose=args.verbose)
     logger.debug("Logging initialized in DEBUG mode")
     logger.debug(f"Command-line arguments: {args}")
 
