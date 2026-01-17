@@ -10,6 +10,8 @@ resources:
           default: landing
         - name: volume
           default: machine_uploads
+        - name: log_subdir
+          default: data_generator
         - name: num_machines
           default: "10"
         - name: num_readings
@@ -30,6 +32,8 @@ resources:
               - "{{job.parameters.schema}}"
               - "--volume"
               - "{{job.parameters.volume}}"
+              - "--log-subdir"
+              - "{{job.parameters.log_subdir}}"
               - "--num-machines"
               - "{{job.parameters.num_machines}}"
               - "--num-readings"
