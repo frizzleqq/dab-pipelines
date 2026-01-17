@@ -64,7 +64,7 @@ def create_log_volume(
     return volume_path
 
 
-def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None:
+def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> Optional[Path]:
     """Configure logging for the application.
 
     Sets up logging with a consistent format across all modules. By default,
@@ -80,6 +80,11 @@ def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None
     log_dir : Path, optional
         Directory path for log files. If provided, logs will be written to
         a timestamped file: dab_pipelines_YYYYMMDD_HHMMSS.log
+
+    Returns
+    -------
+    Path, optional
+        The full path to the log file if log_dir was provided, None otherwise.
 
     Examples
     --------
@@ -129,3 +134,7 @@ def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None
 
         # Add file handler to root logger
         root_logger.addHandler(file_handler)
+
+        return log_file
+
+    return None

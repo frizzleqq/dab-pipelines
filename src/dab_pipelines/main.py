@@ -107,8 +107,9 @@ def main():
     # Create log directory if log_subdir is provided
     if args.log_subdir:
         log_dir = logging_config.create_log_volume(catalog=args.catalog, log_subdir=args.log_subdir)
-        logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
-        logger.info(f"Logging to directory: {log_dir}")
+        log_file = logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
+        if log_file:
+            logger.info(f"Logging to file: {log_file}")
     else:
         # Initialize basic logging (commands will re-configure if --log-subdir is provided)
         logging_config.setup_logging(verbose=args.verbose)
