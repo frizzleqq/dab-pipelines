@@ -1,10 +1,13 @@
 import argparse
+import logging
 from datetime import UTC, datetime
 
 from databricks.sdk.runtime import spark
 
-from dab_pipelines import databricks_utils, taxis
+from dab_pipelines import databricks_utils, logging_config, taxis
 from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator, create_machine_example_schemas
+
+logger = logging.getLogger(__name__)
 
 
 def generate_data(args):
@@ -22,7 +25,7 @@ def generate_data(args):
         volume_name=args.volume,
     )
 
-    print(f"Generating synthetic data to: {output_path}")
+    logger.info(f"Generating synthetic data to: {output_path}")
 
     # Create generator with seed for reproducibility
     generator = SyntheticDataGenerator(seed=args.seed, timestamp=datetime.now(tz=UTC))
@@ -33,9 +36,9 @@ def generate_data(args):
     # Generate and save
     file_paths = generator.generate_and_save(schemas, output_path)
 
-    print(f"\nSuccessfully generated {len(file_paths)} datasets:")
+    logger.info(f"Successfully generated {len(file_paths)} datasets:")
     for name, path in file_paths.items():
-        print(f"  - {name}: {path}")
+        logger.info(f"{name}: {path}")
 
 
 def run_job(args):
@@ -46,6 +49,8 @@ def run_job(args):
     args : argparse.Namespace
         Command-line arguments containing catalog and schema.
     """
+    logger.info(f"Running job with catalog={args.catalog}, schema={args.schema}")
+
     # Set the default catalog and schema
     spark.sql(f"USE CATALOG {args.catalog}")
     spark.sql(f"USE SCHEMA {args.schema}")
@@ -59,6 +64,16 @@ def main():
     parser = argparse.ArgumentParser(
         description="Databricks pipeline utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    # Add global verbose flag
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose (DEBUG) logging")
+
+    # Add global log-subdir parameter
+    parser.add_argument(
+        "--log-subdir",
+        type=str,
+        help="Subdirectory within /Volumes/{catalog}/default/logs/ for log files (e.g., 'data_generator')",
     )
 
     # Create subparsers for different commands
@@ -89,11 +104,28 @@ def main():
     # Parse arguments
     args = parser.parse_args()
 
-    # Execute the appropriate function based on subcommand
-    if hasattr(args, "func"):
-        args.func(args)
+    # Create log directory if log_subdir is provided
+    if args.log_subdir:
+        log_dir = logging_config.create_log_volume(catalog=args.catalog, log_subdir=args.log_subdir)
+        log_file = logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
+        if log_file:
+            logger.info(f"Logging to file: {log_file}")
     else:
-        parser.print_help()
+        # Initialize basic logging (commands will re-configure if --log-subdir is provided)
+        logging_config.setup_logging(verbose=args.verbose)
+
+    logger.debug("Logging initialized in DEBUG mode")
+    logger.debug(f"Command-line arguments: {args}")
+
+    try:
+        # Execute the appropriate function based on subcommand
+        if hasattr(args, "func"):
+            args.func(args)
+        else:
+            parser.print_help()
+    finally:
+        # Explicitly shutdown logging to flush all handlers
+        logging.shutdown()
 
 
 if __name__ == "__main__":

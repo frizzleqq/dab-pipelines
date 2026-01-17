@@ -6,6 +6,7 @@ specify field names, types, and generation strategies.
 """
 
 import json
+import logging
 import random
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -15,6 +16,8 @@ from typing import Any
 from faker import Faker
 
 from dab_pipelines.synthetic_data_schemas import DatasetSchema, FieldSchema, create_machine_example_schemas
+
+logger = logging.getLogger(__name__)
 
 
 class SyntheticDataGenerator:
@@ -34,9 +37,11 @@ class SyntheticDataGenerator:
         self.timestamp = timestamp
         if seed is not None:
             random.seed(seed)
+            logger.debug(f"Random seed set to {seed}")
         self.faker = Faker()
         if seed is not None:
             Faker.seed(seed)
+            logger.debug(f"Faker seed set to {seed}")
 
     def _generate_value(self, field_schema: FieldSchema) -> Any:
         """Generate a single value based on field schema.
@@ -123,6 +128,8 @@ class SyntheticDataGenerator:
         list[dict[str, Any]]
             List of generated records.
         """
+        logger.debug(f"Generating dataset '{schema.name}' with {schema.num_records} records")
+
         # Track remaining values for unique reference fields
         unique_references = {}
         for field in schema.fields:
@@ -148,6 +155,8 @@ class SyntheticDataGenerator:
                 else:
                     record[field.name] = self._generate_value(field)
             records.append(record)
+
+        logger.debug(f"Successfully generated {len(records)} records for '{schema.name}'")
         return records
 
     def generate_and_save(
@@ -173,6 +182,7 @@ class SyntheticDataGenerator:
             Mapping of dataset names to file paths.
         """
         output_path = Path(output_dir)
+        logger.info(f"Saving datasets to {output_path}")
 
         file_paths = {}
         for schema in schemas:
@@ -189,13 +199,17 @@ class SyntheticDataGenerator:
                 json.dump(data, f, indent=indent, ensure_ascii=False)
 
             file_paths[schema.name] = file_path
-            print(f"Generated {len(data)} records -> {file_path}")
+            logger.info(f"Generated {len(data)} records -> {file_path}")
 
         return file_paths
 
 
 def main() -> None:
     """Example usage of the synthetic data generator."""
+    from dab_pipelines.logging_config import setup_logging
+
+    # Initialize logging for standalone execution
+    setup_logging(verbose=False)
 
     # Create generator with seed for reproducibility
     generator = SyntheticDataGenerator(seed=42, timestamp=datetime.now(tz=UTC))
@@ -207,7 +221,7 @@ def main() -> None:
     output_dir = Path(__file__).parent.parent.parent / "data_output" / "synthetic_data"
     generator.generate_and_save(schemas, output_dir)
 
-    print(f"\nSynthetic data generated successfully in: {output_dir}")
+    logger.info(f"Synthetic data generated successfully in: {output_dir}")
 
 
 if __name__ == "__main__":

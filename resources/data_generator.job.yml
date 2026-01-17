@@ -10,6 +10,8 @@ resources:
           default: landing
         - name: volume
           default: machine_uploads
+        - name: log_subdir
+          default: data_generator
         - name: num_machines
           default: "10"
         - name: num_readings
@@ -23,6 +25,8 @@ resources:
             package_name: dab_pipelines
             entry_point: main
             parameters:
+              - "--log-subdir"
+              - "{{job.parameters.log_subdir}}"
               - "generate-data"
               - "--catalog"
               - "${var.catalog}"
