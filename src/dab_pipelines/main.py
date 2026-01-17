@@ -1,4 +1,5 @@
 import argparse
+import logging
 from datetime import UTC, datetime
 
 from databricks.sdk.runtime import spark
@@ -6,7 +7,7 @@ from databricks.sdk.runtime import spark
 from dab_pipelines import databricks_utils, logging_config, taxis
 from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator, create_machine_example_schemas
 
-logger = logging_config.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def generate_data(args):
@@ -17,12 +18,6 @@ def generate_data(args):
     args : argparse.Namespace
         Command-line arguments containing catalog, schema, volume, and optional parameters.
     """
-    # Create log directory if log_subdir is provided
-    if args.log_subdir:
-        log_dir = logging_config.create_log_directory(catalog=args.catalog, log_subdir=args.log_subdir)
-        logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
-        logger.info(f"Logging to directory: {log_dir}")
-
     # Ensure the volume exists before writing data
     output_path = databricks_utils.create_volume_if_not_exists(
         catalog=args.catalog,
@@ -43,7 +38,7 @@ def generate_data(args):
 
     logger.info(f"Successfully generated {len(file_paths)} datasets:")
     for name, path in file_paths.items():
-        logger.info(f"  - {name}: {path}")
+        logger.info(f"{name}: {path}")
 
 
 def run_job(args):
@@ -54,12 +49,6 @@ def run_job(args):
     args : argparse.Namespace
         Command-line arguments containing catalog and schema.
     """
-    # Create log directory if log_subdir is provided
-    if args.log_subdir:
-        log_dir = logging_config.create_log_directory(catalog=args.catalog, log_subdir=args.log_subdir)
-        logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
-        logger.info(f"Logging to directory: {log_dir}")
-
     logger.info(f"Running job with catalog={args.catalog}, schema={args.schema}")
 
     # Set the default catalog and schema
@@ -115,8 +104,15 @@ def main():
     # Parse arguments
     args = parser.parse_args()
 
-    # Initialize basic logging (commands will re-configure if --log-subdir is provided)
-    logging_config.setup_logging(verbose=args.verbose)
+    # Create log directory if log_subdir is provided
+    if args.log_subdir:
+        log_dir = logging_config.create_log_volume(catalog=args.catalog, log_subdir=args.log_subdir)
+        logging_config.setup_logging(verbose=args.verbose, log_dir=log_dir)
+        logger.info(f"Logging to directory: {log_dir}")
+    else:
+        # Initialize basic logging (commands will re-configure if --log-subdir is provided)
+        logging_config.setup_logging(verbose=args.verbose)
+
     logger.debug("Logging initialized in DEBUG mode")
     logger.debug(f"Command-line arguments: {args}")
 

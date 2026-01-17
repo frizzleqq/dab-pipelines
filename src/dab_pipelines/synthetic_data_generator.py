@@ -6,6 +6,7 @@ specify field names, types, and generation strategies.
 """
 
 import json
+import logging
 import random
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -14,10 +15,9 @@ from typing import Any
 
 from faker import Faker
 
-from dab_pipelines.logging_config import get_logger
 from dab_pipelines.synthetic_data_schemas import DatasetSchema, FieldSchema, create_machine_example_schemas
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SyntheticDataGenerator:

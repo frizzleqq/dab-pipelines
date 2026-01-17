@@ -14,7 +14,7 @@ from typing import Optional
 from dab_pipelines import databricks_utils
 
 
-def create_log_directory(
+def create_log_volume(
     catalog: str,
     log_subdir: Optional[str] = None,
     schema: str = "default",
@@ -50,9 +50,6 @@ def create_log_directory(
     >>> create_log_directory("main", schema="prod", volume_name="app_logs")
     PosixPath('/Volumes/main/prod/app_logs')
     """
-    logger = get_logger(__name__)
-    logger.info(f"Ensuring logs volume exists: catalog={catalog}, schema={schema}, volume={volume_name}")
-
     # Create the volume if it doesn't exist
     volume_path = databricks_utils.create_volume_if_not_exists(
         catalog=catalog,
@@ -132,27 +129,3 @@ def setup_logging(verbose: bool = False, log_dir: Optional[Path] = None) -> None
 
         # Add file handler to root logger
         root_logger.addHandler(file_handler)
-
-
-def get_logger(name: str) -> logging.Logger:
-    """Get a logger instance for a module.
-
-    This is a convenience wrapper around logging.getLogger() to maintain
-    consistency across the codebase.
-
-    Parameters
-    ----------
-    name : str
-        The name of the logger, typically __name__ of the calling module.
-
-    Returns
-    -------
-    logging.Logger
-        Configured logger instance.
-
-    Examples
-    --------
-    >>> logger = get_logger(__name__)
-    >>> logger.info("Processing started")
-    """
-    return logging.getLogger(name)

@@ -1,14 +1,13 @@
 """Utilities for Databricks operations using the Databricks SDK."""
 
+import logging
 from pathlib import Path
 from typing import Optional
 
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.catalog import VolumeType
 
-from dab_pipelines.logging_config import get_logger
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def create_volume_if_not_exists(

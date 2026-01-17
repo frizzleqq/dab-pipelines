@@ -25,6 +25,8 @@ resources:
             package_name: dab_pipelines
             entry_point: main
             parameters:
+              - "--log-subdir"
+              - "{{job.parameters.log_subdir}}"
               - "generate-data"
               - "--catalog"
               - "${var.catalog}"
@@ -32,8 +34,6 @@ resources:
               - "{{job.parameters.schema}}"
               - "--volume"
               - "{{job.parameters.volume}}"
-              - "--log-subdir"
-              - "{{job.parameters.log_subdir}}"
               - "--num-machines"
               - "{{job.parameters.num_machines}}"
               - "--num-readings"
