@@ -116,11 +116,15 @@ def main():
     logger.debug("Logging initialized in DEBUG mode")
     logger.debug(f"Command-line arguments: {args}")
 
-    # Execute the appropriate function based on subcommand
-    if hasattr(args, "func"):
-        args.func(args)
-    else:
-        parser.print_help()
+    try:
+        # Execute the appropriate function based on subcommand
+        if hasattr(args, "func"):
+            args.func(args)
+        else:
+            parser.print_help()
+    finally:
+        # Explicitly shutdown logging to flush all handlers
+        logging.shutdown()
 
 
 if __name__ == "__main__":
