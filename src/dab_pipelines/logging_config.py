@@ -14,10 +14,15 @@ from typing import Optional
 from dab_pipelines import databricks_utils
 
 
-def create_log_directory(catalog: str, log_subdir: Optional[str] = None) -> Path:
+def create_log_directory(
+    catalog: str,
+    log_subdir: Optional[str] = None,
+    schema: str = "default",
+    volume_name: str = "logs",
+) -> Path:
     """Create log directory in Unity Catalog Volume.
 
-    Creates the logs volume in the 'default' schema if it doesn't exist,
+    Creates the logs volume in the specified schema if it doesn't exist,
     and returns the full path including any subdirectory.
 
     Parameters
@@ -26,11 +31,15 @@ def create_log_directory(catalog: str, log_subdir: Optional[str] = None) -> Path
         The Unity Catalog name.
     log_subdir : str, optional
         Subdirectory within the logs volume for organizing logs.
+    schema : str, default="default"
+        The schema name where the logs volume is located.
+    volume_name : str, default="logs"
+        The volume name for storing logs.
 
     Returns
     -------
     Path
-        Full path to the log directory: /Volumes/{catalog}/default/logs/{log_subdir}
+        Full path to the log directory: /Volumes/{catalog}/{schema}/{volume_name}/{log_subdir}
 
     Examples
     --------
@@ -38,11 +47,9 @@ def create_log_directory(catalog: str, log_subdir: Optional[str] = None) -> Path
     PosixPath('/Volumes/main/default/logs')
     >>> create_log_directory("main", "data_generator")
     PosixPath('/Volumes/main/default/logs/data_generator')
+    >>> create_log_directory("main", schema="prod", volume_name="app_logs")
+    PosixPath('/Volumes/main/prod/app_logs')
     """
-    # Always use 'default' schema and 'logs' volume
-    schema = "default"
-    volume_name = "logs"
-
     logger = get_logger(__name__)
     logger.info(f"Ensuring logs volume exists: catalog={catalog}, schema={schema}, volume={volume_name}")
 
