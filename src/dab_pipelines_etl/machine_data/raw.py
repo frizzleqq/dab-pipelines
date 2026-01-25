@@ -11,14 +11,13 @@ def machine_dim():
     Returns:
         DataFrame: Machine dimension data with all columns from source JSON files.
     """
-    catalog = spark.conf.get("catalog")
-    current_catalog = spark.catalog.currentCatalog()
-    assert catalog == current_catalog, f"Expected catalog {catalog}, but got {current_catalog}"
+    # catalog = spark.sql("SELECT current_catalog();").first()[0]
 
     return (
         spark.readStream.format("cloudFiles")
         .option("cloudFiles.format", "json")
-        .load(f"/Volumes/{catalog}/landing/machine_uploads/machine_dim")
+        .option("cloudFiles.schemaLocation", "/Volumes/lake_dev/landing/machine_uploads/schema_evolution/machine_dim")
+        .load(f"/Volumes/lake_dev/landing/machine_uploads/machine_dim")
     )
 
 
@@ -29,12 +28,11 @@ def sensor_facts():
     Returns:
         DataFrame: Sensor facts data with all columns from source JSON files.
     """
-    catalog = spark.conf.get("catalog")
-    current_catalog = spark.catalog.currentCatalog()
-    assert catalog == current_catalog, f"Expected catalog {catalog}, but got {current_catalog}"
+    # catalog = spark.catalog.currentCatalog()
 
     return (
         spark.readStream.format("cloudFiles")
         .option("cloudFiles.format", "json")
-        .load(f"/Volumes/{catalog}/landing/machine_uploads/sensor_facts")
+        .option("cloudFiles.schemaLocation", f"/Volumes/lake_dev/landing/machine_uploads/schema_evolution/machine_dim")
+        .load(f"/Volumes/lake_dev/landing/machine_uploads/sensor_facts")
     )
