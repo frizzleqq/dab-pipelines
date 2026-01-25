@@ -163,18 +163,15 @@ class SyntheticDataGenerator:
         self,
         schemas: list[DatasetSchema],
         output_dir: Path | str,
-        indent: int = 2,
     ) -> dict[str, Path]:
-        """Generate datasets and save to JSON files.
+        """Generate datasets and save to JSONL files (newline-delimited JSON).
 
         Parameters
         ----------
         schemas : list[DatasetSchema]
             List of dataset schemas to generate.
         output_dir : Path | str
-            Directory to save JSON files.
-        indent : int
-            JSON indentation for readability.
+            Directory to save JSONL files.
 
         Returns
         -------
@@ -196,7 +193,8 @@ class SyntheticDataGenerator:
             file_path = output_path / schema.name / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=indent, ensure_ascii=False)
+                for record in data:
+                    f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
             file_paths[schema.name] = file_path
             logger.info(f"Generated {len(data)} records -> {file_path}")

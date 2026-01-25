@@ -1,0 +1,23 @@
+# Pipeline for loading machine data using autoloader
+
+resources:
+  pipelines:
+    pipeline_machine_data:
+      name: pipeline_machine_data
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "../src/dab_pipelines_etl"
+
+      libraries:
+        - glob:
+            include: ../src/dab_pipelines_etl/machine_data/**
+
+      configuration:
+        volume_catalog: "${var.catalog}"
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}

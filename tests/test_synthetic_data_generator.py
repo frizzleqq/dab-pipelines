@@ -167,7 +167,7 @@ class TestSyntheticDataGenerator:
         assert all("id" in record and "name" in record and "is_active" in record for record in dataset)
 
     def test_generate_and_save(self):
-        """Test generating and saving datasets to files."""
+        """Test generating and saving datasets to JSONL files."""
         generator = SyntheticDataGenerator(seed=42)
         schemas = [
             DatasetSchema(
@@ -186,9 +186,9 @@ class TestSyntheticDataGenerator:
             assert "test_dataset" in file_paths
             assert file_paths["test_dataset"].exists()
 
-            # Verify file contents
+            # Verify file contents (JSONL format - one JSON object per line)
             with open(file_paths["test_dataset"]) as f:
-                data = json.load(f)
+                data = [json.loads(line) for line in f]
 
             assert len(data) == 5
             assert all("id" in record and "value" in record for record in data)
