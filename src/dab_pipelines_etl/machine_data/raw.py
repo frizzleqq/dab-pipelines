@@ -33,6 +33,6 @@ def sensor_facts():
     return (
         spark.readStream.format("cloudFiles")
         .option("cloudFiles.format", "json")
-        .option("cloudFiles.schemaLocation", f"/Volumes/lake_dev/landing/machine_uploads/schema_evolution/machine_dim")
+        .option("cloudFiles.schemaLocation", f"/Volumes/lake_dev/landing/machine_uploads/schema_evolution/sensor_facts")
         .load(f"/Volumes/lake_dev/landing/machine_uploads/sensor_facts")
     )
