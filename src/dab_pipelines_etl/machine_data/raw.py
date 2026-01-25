@@ -96,7 +96,7 @@ def create_autoloader_table(config_key: str) -> Callable:
         return (
             spark.readStream.format("cloudFiles")
             .option("cloudFiles.format", "json")
-            .option("cloudFiles.schemaLocation", f"{base_path}/schema_evolution/{config['source_path']}")
+            .option("cloudFiles.schemaLocation", f"{base_path}/_schema_evolution/{config['source_path']}")
             .option("cloudFiles.schemaHints", schema_hints)
             .load(f"{base_path}/{config['source_path']}")
         )
