@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    etl_machine_data:
-      name: etl_machine_data
+    pipeline_machine_data:
+      name: pipeline_machine_data
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true
