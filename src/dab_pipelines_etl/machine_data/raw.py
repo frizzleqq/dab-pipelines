@@ -1,5 +1,7 @@
 """Delta Live Table pipeline for loading machine data using autoloader."""
 
+from typing import Callable
+
 from databricks.sdk.runtime import spark
 from pyspark import pipelines as dp
 from pyspark.sql import types as T
@@ -17,7 +19,7 @@ MACHINE_DATA_CONFIG = {
                 T.StructField("location", T.StringType(), nullable=True),
                 T.StructField("machine_type", T.StringType(), nullable=True),
                 T.StructField("manufacturer", T.StringType(), nullable=True),
-                T.StructField("installation_date", T.StringType(), nullable=True),
+                T.StructField("installation_date", T.TimestampType(), nullable=True),
                 T.StructField("status", T.StringType(), nullable=True),
                 T.StructField("max_temperature", T.DoubleType(), nullable=True),
                 T.StructField("max_pressure", T.DoubleType(), nullable=True),
@@ -32,7 +34,7 @@ MACHINE_DATA_CONFIG = {
             [
                 T.StructField("reading_id", T.StringType(), nullable=False),
                 T.StructField("machine_id", T.StringType(), nullable=False),
-                T.StructField("timestamp", T.StringType(), nullable=True),
+                T.StructField("timestamp", T.TimestampType(), nullable=True),
                 T.StructField("temperature", T.DoubleType(), nullable=True),
                 T.StructField("pressure", T.DoubleType(), nullable=True),
                 T.StructField("vibration", T.DoubleType(), nullable=True),
@@ -45,7 +47,28 @@ MACHINE_DATA_CONFIG = {
 }
 
 
-def create_autoloader_table(config_key: str) -> callable:
+def _schema_to_hints(schema: T.StructType) -> str:
+    """Convert StructType schema to cloudFiles.schemaHints format.
+
+    Parameters
+    ----------
+    schema : T.StructType
+        PySpark schema to convert.
+
+    Returns
+    -------
+    str
+        Schema hints string in format: "col1 TYPE, col2 TYPE, ..."
+    """
+    hints = []
+    for field in schema.fields:
+        type_name = field.dataType.simpleString()
+        hints.append(f"{field.name} {type_name}")
+
+    return ", ".join(hints)
+
+
+def create_autoloader_table(config_key: str) -> Callable:
     """Create a DLT table function for loading data via autoloader.
 
     Parameters
@@ -55,7 +78,7 @@ def create_autoloader_table(config_key: str) -> callable:
 
     Returns
     -------
-    callable
+    Callable
         Function that returns a streaming DataFrame configured for autoloader.
     """
     try:
@@ -65,14 +88,16 @@ def create_autoloader_table(config_key: str) -> callable:
 
     @dp.table(name=config["table_name"], comment=config["comment"])
     def _table_function():
-        catalog = spark.catalog.currentCatalog()
+        # catalog = spark.catalog.currentCatalog()
+        catalog = "lake_dev"  # TODO: Replace with dynamic catalog retrieval
         base_path = f"/Volumes/{catalog}/landing/machine_uploads"
+        schema_hints = _schema_to_hints(config["schema"])
 
         return (
             spark.readStream.format("cloudFiles")
             .option("cloudFiles.format", "json")
             .option("cloudFiles.schemaLocation", f"{base_path}/schema_evolution/{config['source_path']}")
-            .option("cloudFiles.schemaHints", config["schema"].simpleString())
+            .option("cloudFiles.schemaHints", schema_hints)
             .load(f"{base_path}/{config['source_path']}")
         )
 
