@@ -13,6 +13,9 @@ resources:
         - glob:
             include: ../src/dab_pipelines_etl/machine_data/**
 
+      configuration:
+        - volume_catalog: "${var.catalog}"
+
       environment:
         dependencies:
           # We include every dependency defined by pyproject.toml by defining an editable environment

@@ -88,8 +88,8 @@ def create_autoloader_table(config_key: str) -> Callable:
 
     @dp.table(name=config["table_name"], comment=config["comment"])
     def _table_function():
-        # catalog = spark.catalog.currentCatalog()
-        catalog = "lake_dev"  # TODO: Replace with dynamic catalog retrieval
+        # Get catalog from pipeline configuration
+        catalog = spark.conf.get("volume_catalog")
         base_path = f"/Volumes/{catalog}/landing/machine_uploads"
         schema_hints = _schema_to_hints(config["schema"])
 
