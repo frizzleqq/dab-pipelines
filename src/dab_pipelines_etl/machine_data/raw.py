@@ -4,7 +4,8 @@ from typing import Callable
 
 from databricks.sdk.runtime import spark
 from pyspark import pipelines as dp
-from pyspark.sql import functions as F, types as T
+from pyspark.sql import functions as F
+from pyspark.sql import types as T
 
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {
@@ -114,7 +115,8 @@ def create_autoloader_table(config_key: str) -> Callable:
                 "_file_name": F.col("_metadata.file_name"),
                 "_file_modification_time": F.col("_metadata.file_modification_time"),
                 "_file_size": F.col("_metadata.file_size"),
-            })
+            }
+        )
 
         return df
 
