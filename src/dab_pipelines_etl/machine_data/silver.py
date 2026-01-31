@@ -7,52 +7,39 @@ from pyspark.sql import types as T
 from dab_pipelines import df_utils
 
 
-@dp.table(
-    name="silver.machine_dim_scd2",
-    comment="Machine dimension with SCD Type 2 tracking historical changes",
-    table_properties={"quality": "silver"},
-)
-@dp.expect_all_or_drop(
-    {
-        "valid_machine_id": "machine_id IS NOT NULL",
-        "valid_effective_from": "effective_from IS NOT NULL",
-    }
-)
-def machine_dim_scd2():
-    """Create SCD Type 2 dimension table for machines.
-
-    Tracks historical changes to machine attributes with:
-    - effective_from: When this version became active
-    - effective_to: When this version was superseded (NULL for current)
-    - is_current: Boolean flag for current version
-    - version: Sequential version number per machine
+@dp.temporary_view(name="silver._tmp_machine_dim_source")
+def tmp_machine_dim_source():
+    """Source view for machine dimension data.
 
     Returns
     -------
     DataFrame
-        Machine dimension with SCD Type 2 tracking.
+        Cleaned machine dimension data ready for SCD Type 2 processing.
     """
-    # Read from raw table
     df = dp.read_stream("raw.machine_dim")
+    # Keep _file_modification_time for sequencing, drop other technical columns
     df = df_utils.drop_technical_columns(df)
-
-    # Add SCD Type 2 tracking columns
-    df = (
-        df.withColumn("effective_from", F.col("_file_modification_time"))
-        .withColumn("effective_to", F.lit(None).cast(T.TimestampType()))
-        .withColumn("is_current", F.lit(True))
-        .withColumn(
-            "version",
-            F.row_number().over(F.window.partitionBy("machine_id").orderBy(F.col("_file_modification_time"))),
-        )
-        .withColumn("_loading_ts", F.current_timestamp())
-    )
-
     return df
+
+# Create SCD Type 2 dimension table using DLT's apply_changes
+dp.create_streaming_table(
+    name="silver.dim_machine",
+    comment="Machine dimension with SCD Type 2 tracking historical changes",
+    table_properties={"quality": "silver", "pipelines.autoOptimize.zOrderCols": "machine_id"},
+)
+
+dp.apply_changes(
+    target="silver.dim_machine",
+    source="silver._tmp_machine_dim_source",
+    keys=["machine_id"],
+    sequence_by=F.col("_file_modification_time"),
+    stored_as_scd_type="2",
+    except_column_list=["_file_modification_time"],
+)
 
 
 @dp.table(
-    name="silver.sensor_facts",
+    name="silver.fact_sensor",
     comment="Cleaned and enriched sensor readings fact table",
     table_properties={"quality": "silver"},
 )
@@ -67,7 +54,7 @@ def machine_dim_scd2():
 @dp.expect_or_drop("reasonable_pressure", "pressure >= 0")
 @dp.expect_or_drop("reasonable_vibration", "vibration >= 0")
 @dp.expect_or_drop("reasonable_power", "power_consumption >= 0")
-def sensor_facts():
+def fact_sensor():
     """Create cleaned sensor facts table with data quality checks.
 
     Applies data quality expectations to:
@@ -81,7 +68,7 @@ def sensor_facts():
         Cleaned and enriched sensor facts.
     """
     df = dp.read_stream("raw.sensor_facts")
-    df = df_utils.drop_underscore_columns(df)
+    df = df_utils.drop_technical_columns(df)
 
     # Add derived time attributes for analytics
     df = df.withColumns(
