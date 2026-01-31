@@ -3,7 +3,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import types as T
 
-from dab_pipelines.df_utils import drop_technical_columns, schema_to_hints
+from dab_pipelines_etl.machine_data.df_utils import drop_technical_columns, schema_to_hints
 
 
 class TestSchemaToHints:

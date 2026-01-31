@@ -7,7 +7,7 @@ from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
-from dab_pipelines import df_utils
+from dab_pipelines_etl.machine_data import df_utils
 
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {
