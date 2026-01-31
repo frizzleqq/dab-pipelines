@@ -4,10 +4,11 @@ from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
-from dab_pipelines_etl.machine_data import df_utils
+# TODO: i would much rather have this as part of dab_pipelines package
+import df_utils
 
 
-@dp.temporary_view(name="silver._tmp_machine_dim_source")
+@dp.temporary_view()
 def tmp_machine_dim_source():
     """Source view for machine dimension data.
 
@@ -17,7 +18,8 @@ def tmp_machine_dim_source():
         Cleaned machine dimension data ready for SCD Type 2 processing.
     """
     df = dp.read_stream("raw.machine_dim")
-    # Keep _file_modification_time for sequencing, drop other technical columns
+    # Keep _file_modification_time as machine_timestamp
+    df = df.withColumnRenamed("_file_modification_time", "machine_timestamp")
     df = df_utils.drop_technical_columns(df)
     return df
 
@@ -30,11 +32,11 @@ dp.create_streaming_table(
 
 dp.apply_changes(
     target="silver.dim_machine",
-    source="silver._tmp_machine_dim_source",
+    source="tmp_machine_dim_source",
     keys=["machine_id"],
-    sequence_by=F.col("_file_modification_time"),
+    sequence_by=F.col("machine_timestamp"),
     stored_as_scd_type="2",
-    except_column_list=["_file_modification_time"],
+    except_column_list=["machine_timestamp"],
 )
 
 

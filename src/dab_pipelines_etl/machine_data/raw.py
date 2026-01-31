@@ -7,7 +7,8 @@ from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
-from dab_pipelines_etl.machine_data import df_utils
+# TODO: i would much rather have this as part of dab_pipelines package
+import df_utils
 
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {
@@ -50,7 +51,7 @@ MACHINE_DATA_CONFIG = {
 }
 
 
-def create_autoloader_table(config_key: str) -> Callable[[dp.QueryFunction], None]:
+def create_autoloader_table(config_key: str) -> Callable:
     """Create a DLT table function for loading data via autoloader.
 
     Parameters
