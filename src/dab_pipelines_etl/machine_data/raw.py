@@ -4,7 +4,7 @@ from typing import Callable
 
 from databricks.sdk.runtime import spark
 from pyspark import pipelines as dp
-from pyspark.sql import types as T
+from pyspark.sql import functions as F, types as T
 
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {
@@ -93,13 +93,30 @@ def create_autoloader_table(config_key: str) -> Callable:
         base_path = f"/Volumes/{catalog}/landing/machine_uploads"
         schema_hints = _schema_to_hints(config["schema"])
 
-        return (
+        # setup autoloader config
+        df = (
             spark.readStream.format("cloudFiles")
             .option("cloudFiles.format", "json")
+            .option("pathGlobFilter", "*.json")
             .option("cloudFiles.schemaLocation", f"{base_path}/_schema_evolution/{config['source_path']}")
             .option("cloudFiles.schemaHints", schema_hints)
+            .option("rescuedDataColumn", "_rescued")
+            # Archive processed files after some time
+            .option("cloudFiles.cleanSource", "MOVE")
+            .option("cloudFiles.cleanSource.retentionDuration", "30 days")
+            .option("cloudFiles.cleanSource.moveDestination", f"{base_path}/_archive/{config['source_path']}")
             .load(f"{base_path}/{config['source_path']}")
         )
+        # add file metadata
+        df = df.withColumns(
+            {
+                "_file_path": F.col("_metadata.file_path"),
+                "_file_name": F.col("_metadata.file_name"),
+                "_file_modification_time": F.col("_metadata.file_modification_time"),
+                "_file_size": F.col("_metadata.file_size"),
+            })
+
+        return df
 
     return _table_function
 
