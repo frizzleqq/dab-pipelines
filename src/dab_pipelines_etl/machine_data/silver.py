@@ -10,7 +10,7 @@ from dab_pipelines import df_utils
 @dp.table(
     name="silver.machine_dim_scd2",
     comment="Machine dimension with SCD Type 2 tracking historical changes",
-    table_properties={"quality": "silver", "pipelines.autoOptimize.zOrderCols": "machine_id,is_current"},
+    table_properties={"quality": "silver"},
 )
 @dp.expect_all_or_drop(
     {
@@ -54,7 +54,7 @@ def machine_dim_scd2():
 @dp.table(
     name="silver.sensor_facts",
     comment="Cleaned and enriched sensor readings fact table",
-    table_properties={"quality": "silver", "pipelines.autoOptimize.zOrderCols": "machine_id,timestamp"},
+    table_properties={"quality": "silver"},
 )
 @dp.expect_all_or_drop(
     {

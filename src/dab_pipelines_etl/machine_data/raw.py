@@ -50,7 +50,7 @@ MACHINE_DATA_CONFIG = {
 }
 
 
-def create_autoloader_table(config_key: str) -> Callable:
+def create_autoloader_table(config_key: str) -> Callable[[dp.QueryFunction], None]:
     """Create a DLT table function for loading data via autoloader.
 
     Parameters
@@ -60,7 +60,7 @@ def create_autoloader_table(config_key: str) -> Callable:
 
     Returns
     -------
-    Callable
+    Callable[[dp.QueryFunction], None]
         Function that returns a streaming DataFrame configured for autoloader.
     """
     try:
@@ -68,7 +68,7 @@ def create_autoloader_table(config_key: str) -> Callable:
     except KeyError:
         raise ValueError(f"Invalid config_key '{config_key}'. Valid keys: {list(MACHINE_DATA_CONFIG.keys())}")
 
-    @dp.table(name=config["table_name"], comment=config["comment"])
+    @dp.table(name=config["table_name"], comment=config["comment"], table_properties={"quality": "raw"})
     def _table_function():
         # Get catalog from pipeline configuration
         catalog = spark.conf.get("volume_catalog")
