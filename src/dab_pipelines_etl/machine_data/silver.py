@@ -1,11 +1,9 @@
 """Delta Live Table pipeline for silver layer - SCD Type 2 dimension and fact tables."""
 
-from pyspark import pipelines as dp
-from pyspark.sql import functions as F
-from pyspark.sql import types as T
-
 # TODO: i would much rather have this as part of dab_pipelines package
 import df_utils
+from pyspark import pipelines as dp
+from pyspark.sql import functions as F
 
 
 @dp.temporary_view()
@@ -22,6 +20,7 @@ def tmp_machine_dim_source():
     df = df.withColumnRenamed("_file_modification_time", "machine_timestamp")
     df = df_utils.drop_technical_columns(df)
     return df
+
 
 # Create SCD Type 2 dimension table using DLT's apply_changes
 dp.create_streaming_table(
