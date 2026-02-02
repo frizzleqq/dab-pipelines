@@ -2,12 +2,12 @@
 
 from typing import Callable
 
-# TODO: i would much rather have this as part of dab_pipelines package
-import df_utils
 from databricks.sdk.runtime import spark
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
+
+from dab_pipelines import df_utils
 
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {

@@ -1,9 +1,9 @@
 """Delta Live Table pipeline for silver layer - SCD Type 2 dimension and fact tables."""
 
-# TODO: i would much rather have this as part of dab_pipelines package
-import df_utils
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
+
+from dab_pipelines import df_utils
 
 
 @dp.temporary_view()
