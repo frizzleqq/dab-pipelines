@@ -7,7 +7,8 @@ resources:
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true
-      root_path: "../src/dab_pipelines_etl"
+      # The root path is useful during development in pipeline editor (but dependencies is preferred)
+      root_path: "../src"
 
       libraries:
         - glob:
@@ -18,6 +19,4 @@ resources:
 
       environment:
         dependencies:
-          # We include every dependency defined by pyproject.toml by defining an editable environment
-          # that points to the folder where pyproject.toml is deployed.
-          - --editable ${workspace.file_path}
+          - "${workspace.artifact_path}/.internal/dab_pipelines*.whl"

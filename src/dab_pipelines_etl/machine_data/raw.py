@@ -7,6 +7,8 @@ from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
+from dab_pipelines import df_utils
+
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {
     "machine_dim": {
@@ -48,27 +50,6 @@ MACHINE_DATA_CONFIG = {
 }
 
 
-def _schema_to_hints(schema: T.StructType) -> str:
-    """Convert StructType schema to cloudFiles.schemaHints format.
-
-    Parameters
-    ----------
-    schema : T.StructType
-        PySpark schema to convert.
-
-    Returns
-    -------
-    str
-        Schema hints string in format: "col1 TYPE, col2 TYPE, ..."
-    """
-    hints = []
-    for field in schema.fields:
-        type_name = field.dataType.simpleString()
-        hints.append(f"{field.name} {type_name}")
-
-    return ", ".join(hints)
-
-
 def create_autoloader_table(config_key: str) -> Callable:
     """Create a DLT table function for loading data via autoloader.
 
@@ -79,7 +60,7 @@ def create_autoloader_table(config_key: str) -> Callable:
 
     Returns
     -------
-    Callable
+    Callable[[dp.QueryFunction], None]
         Function that returns a streaming DataFrame configured for autoloader.
     """
     try:
@@ -87,12 +68,12 @@ def create_autoloader_table(config_key: str) -> Callable:
     except KeyError:
         raise ValueError(f"Invalid config_key '{config_key}'. Valid keys: {list(MACHINE_DATA_CONFIG.keys())}")
 
-    @dp.table(name=config["table_name"], comment=config["comment"])
+    @dp.table(name=config["table_name"], comment=config["comment"], table_properties={"quality": "raw"})
     def _table_function():
         # Get catalog from pipeline configuration
         catalog = spark.conf.get("volume_catalog")
         base_path = f"/Volumes/{catalog}/landing/machine_uploads"
-        schema_hints = _schema_to_hints(config["schema"])
+        schema_hints = df_utils.schema_to_hints(config["schema"])
 
         # setup autoloader config
         df = (
@@ -111,6 +92,7 @@ def create_autoloader_table(config_key: str) -> Callable:
         # add file metadata
         df = df.withColumns(
             {
+                "_loading_ts": F.current_timestamp(),
                 "_file_path": F.col("_metadata.file_path"),
                 "_file_name": F.col("_metadata.file_name"),
                 "_file_modification_time": F.col("_metadata.file_modification_time"),

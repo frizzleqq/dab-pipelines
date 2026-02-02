@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 from databricks.sdk.runtime import spark
 
-from dab_pipelines import databricks_utils, logging_config, taxis
+from dab_pipelines import databricks_utils, logging_config
 from dab_pipelines.synthetic_data_generator import SyntheticDataGenerator, create_machine_example_schemas
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ def run_job(args):
     spark.sql(f"USE SCHEMA {args.schema}")
 
     # Example: just find all taxis from a sample catalog
-    taxis.find_all_taxis().show(5)
+    # taxis.find_all_taxis().show(5)
 
 
 def main():
