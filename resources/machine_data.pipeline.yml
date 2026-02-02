@@ -7,6 +7,7 @@ resources:
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true
+      # The root path is useful during development in pipeline editor (but dependencies is preferred)
       root_path: "../src"
 
       libraries:
