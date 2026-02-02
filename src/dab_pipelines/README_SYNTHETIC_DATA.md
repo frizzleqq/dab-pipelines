@@ -186,39 +186,6 @@ generator = SyntheticDataGenerator(seed=42)
 generator.generate_and_save([customer_schema, orders_schema], "data_output/data")
 ```
 
-## Available Faker Methods
-
-Common Faker methods you can use with `faker_method`:
-
-- `name`, `first_name`, `last_name`
-- `email`, `phone_number`
-- `company`, `job`
-- `address`, `city`, `country`, `postcode`
-- `text`, `sentence`, `paragraph`
-- `url`, `ipv4`, `user_name`
-- `date`, `date_time`
-- `credit_card_number`, `currency_code`
-
-See [Faker documentation](https://faker.readthedocs.io/) for complete list.
-
-## Integration with PySpark
-
-Load generated JSON data in PySpark:
-
-```python
-from pyspark.sql import SparkSession
-
-spark = SparkSession.builder.getOrCreate()
-
-# Read JSON data
-machines_df = spark.read.json("data_output/synthetic_data/machine_dim.json")
-sensors_df = spark.read.json("data_output/synthetic_data/sensor_facts.json")
-
-# Join dimension and facts
-result = sensors_df.join(machines_df, on="machine_id", how="left")
-result.show()
-```
-
 ## Testing
 
 Run tests for the generator:
