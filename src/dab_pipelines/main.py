@@ -18,7 +18,10 @@ def generate_data(args):
     args : argparse.Namespace
         Command-line arguments containing catalog, schema, volume, and optional parameters.
     """
-    # Ensure the volume exists before writing data
+    databricks_utils.create_schema_if_not_exists(
+        catalog=args.catalog,
+        schema=args.schema,
+    )
     output_path = databricks_utils.create_volume_if_not_exists(
         catalog=args.catalog,
         schema=args.schema,
