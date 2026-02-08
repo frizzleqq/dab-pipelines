@@ -10,6 +10,67 @@ from databricks.sdk.service.catalog import VolumeType
 logger = logging.getLogger(__name__)
 
 
+def create_schema_if_not_exists(
+    catalog: str,
+    schema: str,
+    comment: Optional[str] = None,
+    workspace_client: Optional[WorkspaceClient] = None,
+) -> str:
+    """Create a Databricks Unity Catalog schema if it does not exist.
+
+    This function checks if a schema exists in Unity Catalog and creates
+    it if it doesn't. Returns the full schema name.
+
+    Parameters
+    ----------
+    catalog : str
+        The name of the Unity Catalog catalog.
+    schema : str
+        The name of the schema to create.
+    comment : str, optional
+        Optional comment to describe the schema.
+    workspace_client : WorkspaceClient, optional
+        Databricks workspace client. If None, a new client will be created
+        using default authentication.
+
+    Returns
+    -------
+    str
+        The full schema name (catalog.schema).
+
+    Examples
+    --------
+    >>> # Create a schema
+    >>> schema_name = create_schema_if_not_exists(catalog="my_catalog", schema="my_schema")
+    >>> print(schema_name)
+    'my_catalog.my_schema'
+    """
+    # Initialize workspace client if not provided
+    if workspace_client is None:
+        workspace_client = WorkspaceClient()
+
+    # Construct the full schema name
+    full_schema_name = f"{catalog}.{schema}"
+
+    try:
+        # Check if schema exists
+        workspace_client.schemas.get(full_schema_name)
+        logger.info(f"Schema '{full_schema_name}' already exists.")
+    except Exception:
+        # Schema doesn't exist, create it
+        logger.info(f"Creating schema '{full_schema_name}'...")
+
+        workspace_client.schemas.create(
+            catalog_name=catalog,
+            name=schema,
+            comment=comment,
+        )
+
+        logger.info(f"Successfully created schema '{full_schema_name}'.")
+
+    return full_schema_name
+
+
 def create_volume_if_not_exists(
     catalog: str,
     schema: str,
