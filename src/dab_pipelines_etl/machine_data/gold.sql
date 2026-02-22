@@ -31,7 +31,7 @@ ranked AS (
       ORDER BY m.__START_AT DESC
     ) AS _rn
   FROM date_spine AS d
-  JOIN LIVE.silver.dim_machine AS m
+  JOIN silver.dim_machine AS m
     ON CAST(m.__START_AT AS DATE) <= d.machine_date
    AND (m.__END_AT IS NULL OR CAST(m.__END_AT AS DATE) > d.machine_date)
 )
@@ -70,7 +70,7 @@ SELECT
   max_temperature,
   max_pressure,
   __START_AT AS valid_from
-FROM LIVE.silver.dim_machine
+FROM silver.dim_machine
 WHERE __END_AT IS NULL;
 
 
@@ -97,7 +97,7 @@ SELECT
   is_high_temperature,
   is_high_pressure,
   is_high_vibration
-FROM LIVE.silver.fact_sensor;
+FROM silver.fact_sensor;
 
 
 -- -----------------------------------------------------------------------------
@@ -137,8 +137,8 @@ SELECT
   ROUND(MIN(f.power_consumption), 2)            AS min_power_consumption,
   ROUND(MAX(f.power_consumption), 2)            AS max_power_consumption,
   ROUND(SUM(f.power_consumption), 2)            AS total_power_consumption
-FROM LIVE.silver.fact_sensor         AS f
-LEFT JOIN LIVE.gold.dim_machine_daily AS m
+FROM silver.fact_sensor         AS f
+LEFT JOIN gold.dim_machine_daily AS m
   ON  f.machine_id   = m.machine_id
   AND f.machine_date = m.machine_date
 GROUP BY
