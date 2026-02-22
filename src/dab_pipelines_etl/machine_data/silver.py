@@ -50,7 +50,7 @@ dp.apply_changes(
     {
         "valid_reading_id": "reading_id IS NOT NULL",
         "valid_machine_id": "machine_id IS NOT NULL",
-        "valid_timestamp": "timestamp IS NOT NULL",
+        "valid_timestamp": "machine_timestamp IS NOT NULL",
     }
 )
 @dp.expect_or_drop("reasonable_temperature", "temperature BETWEEN -100 AND 500")
