@@ -17,6 +17,18 @@ We generate synthetic IoT data for machines using `faker` and write them as JSON
 
 See [src/dab_pipelines/README_SYNTHETIC_DATA.md](src/dab_pipelines/README_SYNTHETIC_DATA.md)
 
+## Databricks Workspace
+
+For this example we use a Databricks Free Edition workspace https://www.databricks.com/learn/free-edition with all resources and identities managed in the Workspace.
+
+This Databricks Asset Bundle expects pre-existing Catalogs, Groups and Service Principals to showcase providing permissions on resources such as catalogs or workflows.
+
+* **Catalogs**: `lake_dev`, `lake_test` and `lake_prod`
+* **Service principals**: `sp_etl_dev` (for dev and test) and `sp_etl_prod` (for prod)
+  * Make sure the User used to deploy Workflows has `Service principal: User` on the used service principals
+* **Groups**: `group_etl` and `group_reader`
+  * These are only used to showcase applying grants using Asset Bundle resources
+
 ## Development
 
 ### Requirements
