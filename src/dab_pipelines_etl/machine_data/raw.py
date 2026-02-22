@@ -23,6 +23,7 @@ MACHINE_DATA_CONFIG = {
                 T.StructField("machine_type", T.StringType(), nullable=True),
                 T.StructField("manufacturer", T.StringType(), nullable=True),
                 T.StructField("installation_date", T.TimestampType(), nullable=True),
+                T.StructField("timestamp", T.TimestampType(), nullable=True),
                 T.StructField("status", T.StringType(), nullable=True),
                 T.StructField("max_temperature", T.DoubleType(), nullable=True),
                 T.StructField("max_pressure", T.DoubleType(), nullable=True),

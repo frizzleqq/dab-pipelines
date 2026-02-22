@@ -16,9 +16,11 @@ def tmp_machine_dim_source():
         Cleaned machine dimension data ready for SCD Type 2 processing.
     """
     df = dp.read_stream("raw.machine_dim")
-    # Keep _file_modification_time as machine_timestamp
-    df = df.withColumnRenamed("_file_modification_time", "machine_timestamp")
+    # Use source timestamp as machine_timestamp for SCD sequencing
+    df = df.withColumnRenamed("timestamp", "machine_timestamp")
     df = df_utils.drop_technical_columns(df)
+    df = df.withColumnRenamed("location", "machine_location")
+    df = df.withColumnRenamed("status", "machine_status")
     return df
 
 
@@ -26,7 +28,7 @@ def tmp_machine_dim_source():
 dp.create_streaming_table(
     name="silver.dim_machine",
     comment="Machine dimension with SCD Type 2 tracking historical changes",
-    table_properties={"quality": "silver", "pipelines.autoOptimize.zOrderCols": "machine_id"},
+    table_properties={"quality": "silver"},
 )
 
 dp.apply_changes(
@@ -48,7 +50,7 @@ dp.apply_changes(
     {
         "valid_reading_id": "reading_id IS NOT NULL",
         "valid_machine_id": "machine_id IS NOT NULL",
-        "valid_timestamp": "timestamp IS NOT NULL",
+        "valid_timestamp": "machine_timestamp IS NOT NULL",
     }
 )
 @dp.expect_or_drop("reasonable_temperature", "temperature BETWEEN -100 AND 500")
@@ -71,12 +73,14 @@ def fact_sensor():
     df = dp.read_stream("raw.sensor_facts")
     df = df_utils.drop_technical_columns(df)
 
+    df = df.withColumnRenamed("timestamp", "machine_timestamp")
+
     # Add derived time attributes for analytics
     df = df.withColumns(
         {
-            "reading_date": F.to_date(F.col("timestamp")),
-            "reading_hour": F.hour(F.col("timestamp")),
-            "reading_day_of_week": F.dayofweek(F.col("timestamp")),
+            "machine_date": F.to_date(F.col("machine_timestamp")),
+            "reading_hour": F.hour(F.col("machine_timestamp")),
+            "reading_day_of_week": F.dayofweek(F.col("machine_timestamp")),
             # Calculate if reading is outside normal operating range
             "is_high_temperature": F.when(F.col("temperature") > 80, True).otherwise(False),
             "is_high_pressure": F.when(F.col("pressure") > 100, True).otherwise(False),
