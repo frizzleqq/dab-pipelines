@@ -19,6 +19,8 @@ def tmp_machine_dim_source():
     # Keep _file_modification_time as machine_timestamp
     df = df.withColumnRenamed("_file_modification_time", "machine_timestamp")
     df = df_utils.drop_technical_columns(df)
+    df = df.withColumnRenamed("location", "machine_location")
+    df = df.withColumnRenamed("status", "machine_status")
     return df
 
 
@@ -26,7 +28,7 @@ def tmp_machine_dim_source():
 dp.create_streaming_table(
     name="silver.dim_machine",
     comment="Machine dimension with SCD Type 2 tracking historical changes",
-    table_properties={"quality": "silver", "pipelines.autoOptimize.zOrderCols": "machine_id"},
+    table_properties={"quality": "silver"},
 )
 
 dp.apply_changes(
@@ -74,7 +76,7 @@ def fact_sensor():
     # Add derived time attributes for analytics
     df = df.withColumns(
         {
-            "reading_date": F.to_date(F.col("timestamp")),
+            "machine_date": F.to_date(F.col("timestamp")),
             "reading_hour": F.hour(F.col("timestamp")),
             "reading_day_of_week": F.dayofweek(F.col("timestamp")),
             # Calculate if reading is outside normal operating range
