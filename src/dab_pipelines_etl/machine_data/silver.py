@@ -73,12 +73,14 @@ def fact_sensor():
     df = dp.read_stream("raw.sensor_facts")
     df = df_utils.drop_technical_columns(df)
 
+    df = df.withColumnRenamed("timestamp", "machine_timestamp")
+
     # Add derived time attributes for analytics
     df = df.withColumns(
         {
-            "machine_date": F.to_date(F.col("timestamp")),
-            "reading_hour": F.hour(F.col("timestamp")),
-            "reading_day_of_week": F.dayofweek(F.col("timestamp")),
+            "machine_date": F.to_date(F.col("machine_timestamp")),
+            "reading_hour": F.hour(F.col("machine_timestamp")),
+            "reading_day_of_week": F.dayofweek(F.col("machine_timestamp")),
             # Calculate if reading is outside normal operating range
             "is_high_temperature": F.when(F.col("temperature") > 80, True).otherwise(False),
             "is_high_pressure": F.when(F.col("pressure") > 100, True).otherwise(False),

@@ -84,7 +84,7 @@ AS
 SELECT
   reading_id,
   machine_id,
-  timestamp,
+  machine_timestamp,
   machine_date,
   reading_hour,
   reading_day_of_week,
