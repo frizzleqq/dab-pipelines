@@ -16,8 +16,8 @@ def tmp_machine_dim_source():
         Cleaned machine dimension data ready for SCD Type 2 processing.
     """
     df = dp.read_stream("raw.machine_dim")
-    # Keep _file_modification_time as machine_timestamp
-    df = df.withColumnRenamed("_file_modification_time", "machine_timestamp")
+    # Use source timestamp as machine_timestamp for SCD sequencing
+    df = df.withColumnRenamed("timestamp", "machine_timestamp")
     df = df_utils.drop_technical_columns(df)
     df = df.withColumnRenamed("location", "machine_location")
     df = df.withColumnRenamed("status", "machine_status")

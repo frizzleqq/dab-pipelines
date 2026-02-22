@@ -242,6 +242,7 @@ class TestMachineExampleSchemas:
             "machine_type",
             "manufacturer",
             "installation_date",
+            "timestamp",
             "status",
             "max_temperature",
             "max_pressure",
