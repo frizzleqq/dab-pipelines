@@ -9,3 +9,10 @@ scratch/**
 **/explorations/**
 **/!explorations/README.md
 data_output/
+
+# AI tooling
+.claude/
+.ai-dev-kit/
+.github/skills/
+.mcp.json
+.vscode/mcp.json
