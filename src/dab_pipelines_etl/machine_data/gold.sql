@@ -5,7 +5,7 @@
 -- dim_machine_daily: One row per machine per calendar day (2020-01-01 → today)
 -- Uses the SCD2 validity window to resolve which version was active on each day.
 -- -----------------------------------------------------------------------------
-CREATE OR REFRESH MATERIALIZED VIEW gold.dim_machine_daily
+CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily
 CLUSTER BY (machine_id, machine_date)
 COMMENT "One row per machine per calendar day from 2020-01-01 to current date, showing the machine attributes that were valid on that day according to the SCD2 history"
 TBLPROPERTIES ("quality" = "gold")
@@ -32,7 +32,7 @@ ranked AS (
       ORDER BY m.__START_AT DESC
     ) AS _rn
   FROM date_spine AS d
-  JOIN silver.dim_machine AS m
+  JOIN ${silver_schema}.dim_machine AS m
     ON CAST(m.__START_AT AS DATE) <= d.machine_date
    AND (m.__END_AT IS NULL OR CAST(m.__END_AT AS DATE) > d.machine_date)
 )
@@ -56,7 +56,7 @@ WHERE _rn = 1;
 -- -----------------------------------------------------------------------------
 -- dim_machine_curr: Active machine dimension records (open-ended SCD2 rows)
 -- -----------------------------------------------------------------------------
-CREATE OR REFRESH MATERIALIZED VIEW gold.dim_machine_curr
+CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_curr
 CLUSTER BY (machine_id)
 COMMENT "Current active machine dimension - latest attributes for every machine"
 TBLPROPERTIES ("quality" = "gold")
@@ -72,14 +72,14 @@ SELECT
   max_temperature,
   max_pressure,
   __START_AT AS valid_from
-FROM silver.dim_machine
+FROM ${silver_schema}.dim_machine
 WHERE __END_AT IS NULL;
 
 
 -- -----------------------------------------------------------------------------
 -- fact_sensor: Silver sensor readings with machine_date column
 -- -----------------------------------------------------------------------------
-CREATE OR REFRESH MATERIALIZED VIEW gold.fact_sensor
+CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor
 CLUSTER BY (machine_id, machine_date)
 COMMENT "Sensor readings from silver with machine_date derived from timestamp"
 TBLPROPERTIES ("quality" = "gold")
@@ -100,13 +100,13 @@ SELECT
   is_high_temperature,
   is_high_pressure,
   is_high_vibration
-FROM silver.fact_sensor;
+FROM ${silver_schema}.fact_sensor;
 
 
 -- -----------------------------------------------------------------------------
 -- fact_sensor_agg: Daily aggregations of sensor readings per machine
 -- -----------------------------------------------------------------------------
-CREATE OR REFRESH MATERIALIZED VIEW gold.fact_sensor_agg
+CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor_agg
 CLUSTER BY (machine_id, machine_date)
 COMMENT "Daily aggregated sensor metrics per machine"
 TBLPROPERTIES ("quality" = "gold")
@@ -141,8 +141,8 @@ SELECT
   ROUND(MIN(f.power_consumption), 2)            AS min_power_consumption,
   ROUND(MAX(f.power_consumption), 2)            AS max_power_consumption,
   ROUND(SUM(f.power_consumption), 2)            AS total_power_consumption
-FROM silver.fact_sensor         AS f
-LEFT JOIN gold.dim_machine_daily AS m
+FROM ${silver_schema}.fact_sensor         AS f
+LEFT JOIN ${gold_schema}.dim_machine_daily AS m
   ON  f.machine_id                       = m.machine_id
   AND CAST(f.machine_timestamp AS DATE)  = m.machine_date
 GROUP BY

@@ -8,11 +8,12 @@ from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
 from dab_pipelines import df_utils
+from dab_pipelines_etl.machine_data.pipeline_config import autoloader_metadata_base, machine_uploads_base, raw_schema
 
 # Configuration for machine data ingestion tables
 MACHINE_DATA_CONFIG = {
     "machine_dim": {
-        "table_name": "raw.machine_dim",
+        "table_name": f"{raw_schema}.machine_dim",
         "comment": "Machine dimension data loaded via autoloader from Unity Catalog Volume",
         "source_path": "machine_dim",
         "cluster_by": ["machine_id"],
@@ -32,7 +33,7 @@ MACHINE_DATA_CONFIG = {
         ),
     },
     "sensor_facts": {
-        "table_name": "raw.sensor_facts",
+        "table_name": f"{raw_schema}.sensor_facts",
         "comment": "Sensor facts data loaded via autoloader from Unity Catalog Volume",
         "source_path": "sensor_facts",
         "cluster_by": ["machine_id", "timestamp"],
@@ -78,10 +79,6 @@ def create_autoloader_table(config_key: str) -> Callable:
         cluster_by=config["cluster_by"],
     )
     def _table_function():
-        # Get config from pipeline configuration
-        machine_uploads_path = spark.conf.get("machine_uploads_base")
-        schema_location_path = spark.conf.get("autoloader_metadata_base")
-
         schema_hints = df_utils.schema_to_hints(config["schema"])
 
         # setup autoloader config
@@ -89,16 +86,17 @@ def create_autoloader_table(config_key: str) -> Callable:
             spark.readStream.format("cloudFiles")
             .option("cloudFiles.format", "json")
             .option("pathGlobFilter", "*.json")
-            .option("cloudFiles.schemaLocation", f"{schema_location_path}/{config['source_path']}")
+            .option("cloudFiles.schemaLocation", f"{autoloader_metadata_base}/{config['source_path']}")
             .option("cloudFiles.schemaHints", schema_hints)
             .option("rescuedDataColumn", "_rescued")
             # Archive processed files after some time
             .option("cloudFiles.cleanSource", "MOVE")
             .option("cloudFiles.cleanSource.retentionDuration", "30 days")
             .option(
-                "cloudFiles.cleanSource.moveDestination", f"{machine_uploads_path}/_archive/{config['source_path']}"
+                "cloudFiles.cleanSource.moveDestination",
+                f"{machine_uploads_base}/_archive/{config['source_path']}",
             )
-            .load(f"{machine_uploads_path}/{config['source_path']}")
+            .load(f"{machine_uploads_base}/{config['source_path']}")
         )
         # add file metadata
         df = df.withColumns(
