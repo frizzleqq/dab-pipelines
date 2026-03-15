@@ -48,7 +48,7 @@ targets:
   test:
     mode: production
     presets:
-      name_prefix: "[test] "
+      name_prefix: ""
       trigger_pause_status: PAUSED
     workspace:
       host: https://dbc-ea4bb8e5-6935.cloud.databricks.com

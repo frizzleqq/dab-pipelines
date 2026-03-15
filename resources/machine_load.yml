@@ -7,9 +7,9 @@ resources:
 
       parameters:
         - name: schema
-          default: landing
+          default: ${resources.schemas.schema_landing.name}
         - name: volume
-          default: machine_uploads
+          default: ${resources.volumes.landing_machine_uploads.name}
         - name: log_subdir
           default: data_generator
         - name: num_machines

@@ -15,7 +15,8 @@ resources:
             include: ../src/dab_pipelines_etl/machine_data/**
 
       configuration:
-        landing_base: "/Volumes/${var.catalog}/landing"
+        machine_uploads_base: "/Volumes/${resources.volumes.landing_machine_uploads.catalog_name}/${resources.volumes.landing_machine_uploads.schema_name}/${resources.volumes.landing_machine_uploads.name}"
+        autoloader_metadata_base: "/Volumes/${resources.volumes.landing_metadata.catalog_name}/${resources.volumes.landing_metadata.schema_name}/${resources.volumes.landing_metadata.name}"
 
       environment:
         dependencies:

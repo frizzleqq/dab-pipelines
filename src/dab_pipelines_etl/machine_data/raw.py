@@ -79,9 +79,8 @@ def create_autoloader_table(config_key: str) -> Callable:
     )
     def _table_function():
         # Get config from pipeline configuration
-        landing_base = spark.conf.get("landing_base")
-        machine_uploads_path = f"{landing_base}/machine_uploads"
-        schema_location_path = f"{landing_base}/metadata"
+        machine_uploads_path = spark.conf.get("machine_uploads_base")
+        schema_location_path = spark.conf.get("autoloader_metadata_base")
 
         schema_hints = df_utils.schema_to_hints(config["schema"])
 
