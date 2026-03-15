@@ -1,0 +1,28 @@
+# Unity Catalog volumes for raw machine data landing zone.
+# UC volumes are not subject to the dev mode name prefix.
+
+resources:
+  volumes:
+    landing_machine_uploads:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.schema_landing.name}
+      name: machine_uploads
+      volume_type: MANAGED
+      comment: "Raw machine data files ingested via Auto Loader"
+      grants:
+        - principal: group_etl
+          privileges: [ALL_PRIVILEGES]
+        - principal: group_reader
+          privileges: [READ_VOLUME]
+
+    landing_metadata:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.schema_landing.name}
+      name: metadata
+      volume_type: MANAGED
+      comment: "Auto Loader schema metadata for machine data pipeline"
+      grants:
+        - principal: group_etl
+          privileges: [ALL_PRIVILEGES]
+        - principal: group_reader
+          privileges: [READ_VOLUME]

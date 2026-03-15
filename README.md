@@ -29,6 +29,10 @@ This Databricks Asset Bundle expects pre-existing Catalogs, Groups and Service P
 * **Groups**: `group_etl` and `group_reader`
   * These are only used to showcase applying grants using Asset Bundle resources
 
+## Unity Catalog Resources
+
+Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](resources/schemas.yml) and [`resources/volumes.yml`](resources/volumes.yml) for definitions and grants. In `dev`, names are prefixed with `dev_<username>_` for per-user isolation; names are fixed in `test` and `prod`.
+
 ## Development
 
 ### Requirements

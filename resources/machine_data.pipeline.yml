@@ -15,7 +15,11 @@ resources:
             include: ../src/dab_pipelines_etl/machine_data/**
 
       configuration:
-        volume_catalog: "${var.catalog}"
+        raw_schema: ${resources.schemas.schema_raw.name}
+        silver_schema: ${resources.schemas.schema_silver.name}
+        gold_schema: ${resources.schemas.schema_gold.name}
+        machine_uploads_base: "/Volumes/${var.catalog}/${resources.schemas.schema_landing.name}/${resources.volumes.landing_machine_uploads.name}"
+        autoloader_metadata_base: "/Volumes/${var.catalog}/${resources.schemas.schema_landing.name}/${resources.volumes.landing_metadata.name}"
 
       environment:
         dependencies:

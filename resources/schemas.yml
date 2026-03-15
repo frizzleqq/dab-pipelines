@@ -1,0 +1,44 @@
+# Unity Catalog schemas for the machine data pipeline.
+# Schema names are fixed per environment (no dev mode prefix).
+
+resources:
+  schemas:
+    schema_landing:
+      catalog_name: ${var.catalog}
+      name: landing
+      comment: "Raw data landing zone for file ingestion"
+      grants:
+        - principal: group_etl
+          privileges: [ALL_PRIVILEGES]
+        - principal: group_reader
+          privileges: [USE_SCHEMA]
+
+    schema_raw:
+      catalog_name: ${var.catalog}
+      name: raw
+      comment: "Raw ingested data via Auto Loader"
+      grants:
+        - principal: group_etl
+          privileges: [ALL_PRIVILEGES]
+        - principal: group_reader
+          privileges: [USE_SCHEMA, SELECT]
+
+    schema_silver:
+      catalog_name: ${var.catalog}
+      name: silver
+      comment: "Cleaned and validated data"
+      grants:
+        - principal: group_etl
+          privileges: [ALL_PRIVILEGES]
+        - principal: group_reader
+          privileges: [USE_SCHEMA, SELECT]
+
+    schema_gold:
+      catalog_name: ${var.catalog}
+      name: gold
+      comment: "Business-ready aggregated and dimensional data"
+      grants:
+        - principal: group_etl
+          privileges: [ALL_PRIVILEGES]
+        - principal: group_reader
+          privileges: [USE_SCHEMA, SELECT]
