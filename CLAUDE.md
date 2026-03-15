@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 This repo deploys a Databricks Asset Bundle.
 
@@ -11,13 +11,13 @@ This repo deploys a Databricks Asset Bundle.
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
 * `tests/`: Unit tests for the shared Python code.
 
- ## Setup commands
+## Setup commands
 - Install deps: `uv sync --locked`
 - Run code checks: `uv run ruff check --fix`
 - Check code formatting: `uv run ruff format`
 - Run tests: `uv run pytest -v`
 - To run Python code prefix with: `uv run ...`
- 
+
 ## Code Style
 - Numpy docstring
 - Google Python Style Guide
