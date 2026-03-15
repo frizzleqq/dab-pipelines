@@ -15,7 +15,7 @@ resources:
             include: ../src/dab_pipelines_etl/machine_data/**
 
       configuration:
-        volume_catalog: "${var.catalog}"
+        landing_base: "/Volumes/${var.catalog}/landing"
 
       environment:
         dependencies:

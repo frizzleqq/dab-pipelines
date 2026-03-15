@@ -6,6 +6,7 @@
 -- Uses the SCD2 validity window to resolve which version was active on each day.
 -- -----------------------------------------------------------------------------
 CREATE OR REFRESH MATERIALIZED VIEW gold.dim_machine_daily
+CLUSTER BY (machine_id, machine_date)
 COMMENT "One row per machine per calendar day from 2020-01-01 to current date, showing the machine attributes that were valid on that day according to the SCD2 history"
 TBLPROPERTIES ("quality" = "gold")
 AS
@@ -56,6 +57,7 @@ WHERE _rn = 1;
 -- dim_machine_curr: Active machine dimension records (open-ended SCD2 rows)
 -- -----------------------------------------------------------------------------
 CREATE OR REFRESH MATERIALIZED VIEW gold.dim_machine_curr
+CLUSTER BY (machine_id)
 COMMENT "Current active machine dimension - latest attributes for every machine"
 TBLPROPERTIES ("quality" = "gold")
 AS
@@ -78,6 +80,7 @@ WHERE __END_AT IS NULL;
 -- fact_sensor: Silver sensor readings with machine_date column
 -- -----------------------------------------------------------------------------
 CREATE OR REFRESH MATERIALIZED VIEW gold.fact_sensor
+CLUSTER BY (machine_id, machine_date)
 COMMENT "Sensor readings from silver with machine_date derived from timestamp"
 TBLPROPERTIES ("quality" = "gold")
 AS
@@ -85,9 +88,9 @@ SELECT
   reading_id,
   machine_id,
   machine_timestamp,
-  machine_date,
-  reading_hour,
-  reading_day_of_week,
+  CAST(machine_timestamp AS DATE) AS machine_date,
+  HOUR(machine_timestamp)         AS reading_hour,
+  DAYOFWEEK(machine_timestamp)    AS reading_day_of_week,
   temperature,
   pressure,
   vibration,
@@ -104,11 +107,12 @@ FROM silver.fact_sensor;
 -- fact_sensor_agg: Daily aggregations of sensor readings per machine
 -- -----------------------------------------------------------------------------
 CREATE OR REFRESH MATERIALIZED VIEW gold.fact_sensor_agg
+CLUSTER BY (machine_id, machine_date)
 COMMENT "Daily aggregated sensor metrics per machine"
 TBLPROPERTIES ("quality" = "gold")
 AS
 SELECT
-  f.machine_date,
+  CAST(f.machine_timestamp AS DATE) AS machine_date,
   f.machine_id,
   m.machine_name,
   m.machine_location,
@@ -139,10 +143,10 @@ SELECT
   ROUND(SUM(f.power_consumption), 2)            AS total_power_consumption
 FROM silver.fact_sensor         AS f
 LEFT JOIN gold.dim_machine_daily AS m
-  ON  f.machine_id   = m.machine_id
-  AND f.machine_date = m.machine_date
+  ON  f.machine_id                       = m.machine_id
+  AND CAST(f.machine_timestamp AS DATE)  = m.machine_date
 GROUP BY
-  f.machine_date,
+  CAST(f.machine_timestamp AS DATE),
   f.machine_id,
   m.machine_name,
   m.machine_location,

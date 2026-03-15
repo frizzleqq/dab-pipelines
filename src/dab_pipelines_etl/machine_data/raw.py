@@ -1,4 +1,4 @@
-"""Delta Live Table pipeline for loading machine data using autoloader."""
+"""Spark Declarative Pipeline for loading machine data using autoloader."""
 
 from typing import Callable
 
@@ -15,6 +15,7 @@ MACHINE_DATA_CONFIG = {
         "table_name": "raw.machine_dim",
         "comment": "Machine dimension data loaded via autoloader from Unity Catalog Volume",
         "source_path": "machine_dim",
+        "cluster_by": ["machine_id"],
         "schema": T.StructType(
             [
                 T.StructField("machine_id", T.StringType(), nullable=False),
@@ -34,6 +35,7 @@ MACHINE_DATA_CONFIG = {
         "table_name": "raw.sensor_facts",
         "comment": "Sensor facts data loaded via autoloader from Unity Catalog Volume",
         "source_path": "sensor_facts",
+        "cluster_by": ["machine_id", "timestamp"],
         "schema": T.StructType(
             [
                 T.StructField("reading_id", T.StringType(), nullable=False),
@@ -69,11 +71,18 @@ def create_autoloader_table(config_key: str) -> Callable:
     except KeyError:
         raise ValueError(f"Invalid config_key '{config_key}'. Valid keys: {list(MACHINE_DATA_CONFIG.keys())}")
 
-    @dp.table(name=config["table_name"], comment=config["comment"], table_properties={"quality": "raw"})
+    @dp.table(
+        name=config["table_name"],
+        comment=config["comment"],
+        table_properties={"quality": "raw"},
+        cluster_by=config["cluster_by"],
+    )
     def _table_function():
-        # Get catalog from pipeline configuration
-        catalog = spark.conf.get("volume_catalog")
-        base_path = f"/Volumes/{catalog}/landing/machine_uploads"
+        # Get config from pipeline configuration
+        landing_base = spark.conf.get("landing_base")
+        machine_uploads_path = f"{landing_base}/machine_uploads"
+        schema_location_path = f"{landing_base}/metadata"
+
         schema_hints = df_utils.schema_to_hints(config["schema"])
 
         # setup autoloader config
@@ -81,14 +90,16 @@ def create_autoloader_table(config_key: str) -> Callable:
             spark.readStream.format("cloudFiles")
             .option("cloudFiles.format", "json")
             .option("pathGlobFilter", "*.json")
-            .option("cloudFiles.schemaLocation", f"{base_path}/_schema_evolution/{config['source_path']}")
+            .option("cloudFiles.schemaLocation", f"{schema_location_path}/{config['source_path']}")
             .option("cloudFiles.schemaHints", schema_hints)
             .option("rescuedDataColumn", "_rescued")
             # Archive processed files after some time
             .option("cloudFiles.cleanSource", "MOVE")
             .option("cloudFiles.cleanSource.retentionDuration", "30 days")
-            .option("cloudFiles.cleanSource.moveDestination", f"{base_path}/_archive/{config['source_path']}")
-            .load(f"{base_path}/{config['source_path']}")
+            .option(
+                "cloudFiles.cleanSource.moveDestination", f"{machine_uploads_path}/_archive/{config['source_path']}"
+            )
+            .load(f"{machine_uploads_path}/{config['source_path']}")
         )
         # add file metadata
         df = df.withColumns(
