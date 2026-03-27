@@ -1,11 +1,11 @@
-"""Spark Declarative Pipeline for silver layer - SCD Type 2 dimension and fact tables."""
+"""Spark Declarative Pipeline for silver layer - SCD dimension and fact tables."""
 
 from databricks.sdk.runtime import spark
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 
 from dab_pipelines import df_utils
-from dab_pipelines_etl.machine_data.pipeline_config import raw_schema, silver_schema
+from dab_pipelines_etl.machine_data import pipeline_config as cfg
 
 
 @dp.temporary_view()
@@ -17,7 +17,7 @@ def tmp_machine_dim_source():
     DataFrame
         Cleaned machine dimension data ready for SCD Type 2 processing.
     """
-    df = spark.readStream.table(f"{raw_schema}.machine_dim")
+    df = spark.readStream.table(f"{cfg.raw_schema}.machine_dim")
     # Use source timestamp as machine_timestamp for SCD sequencing
     df = df.withColumnRenamed("timestamp", "machine_timestamp")
     df = df_utils.drop_technical_columns(df)
@@ -26,16 +26,32 @@ def tmp_machine_dim_source():
     return df
 
 
-# Create SCD Type 2 dimension table using AUTO CDC
+# SCD Type 1 - current state (overwrites on change)
 dp.create_streaming_table(
-    name=f"{silver_schema}.dim_machine",
+    name=f"{cfg.silver_schema}.dim_machine",
+    comment="Machine dimension with SCD Type 1 (current state only)",
+    table_properties={"quality": "silver"},
+    cluster_by=["machine_id"],
+)
+
+dp.create_auto_cdc_flow(
+    target=f"{cfg.silver_schema}.dim_machine",
+    source="tmp_machine_dim_source",
+    keys=["machine_id"],
+    sequence_by="machine_timestamp",
+    stored_as_scd_type=1,
+)
+
+# SCD Type 2 - full change history
+dp.create_streaming_table(
+    name=f"{cfg.silver_schema}.dim_machine_history",
     comment="Machine dimension with SCD Type 2 tracking historical changes",
     table_properties={"quality": "silver"},
     cluster_by=["machine_id"],
 )
 
 dp.create_auto_cdc_flow(
-    target=f"{silver_schema}.dim_machine",
+    target=f"{cfg.silver_schema}.dim_machine_history",
     source="tmp_machine_dim_source",
     keys=["machine_id"],
     sequence_by="machine_timestamp",
@@ -44,7 +60,7 @@ dp.create_auto_cdc_flow(
 
 
 @dp.table(
-    name=f"{silver_schema}.fact_sensor",
+    name=f"{cfg.silver_schema}.fact_sensor",
     comment="Cleaned and enriched sensor readings fact table",
     table_properties={"quality": "silver"},
     cluster_by=["machine_id", "machine_timestamp"],
@@ -72,7 +88,7 @@ def fact_sensor():
     DataFrame
         Cleaned sensor facts.
     """
-    df = spark.readStream.table(f"{raw_schema}.sensor_facts")
+    df = spark.readStream.table(f"{cfg.raw_schema}.sensor_facts")
     df = df_utils.drop_technical_columns(df)
 
     df = df.withColumnRenamed("timestamp", "machine_timestamp")

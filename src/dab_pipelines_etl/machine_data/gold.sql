@@ -1,5 +1,5 @@
--- Gold layer materialized views for machine data analytics.
--- Builds on the silver SCD Type 2 dimension and fact tables.
+-- Gold layer views and materialized views for machine data analytics.
+-- Builds on the silver SCD Type 1/2 dimension and fact tables.
 
 -- -----------------------------------------------------------------------------
 -- dim_machine_daily: One row per machine per calendar day (2020-01-01 → today)
@@ -32,7 +32,7 @@ ranked AS (
       ORDER BY m.__START_AT DESC
     ) AS _rn
   FROM date_spine AS d
-  JOIN ${silver_schema}.dim_machine AS m
+  JOIN ${silver_schema}.dim_machine_history AS m
     ON CAST(m.__START_AT AS DATE) <= d.machine_date
    AND (m.__END_AT IS NULL OR CAST(m.__END_AT AS DATE) > d.machine_date)
 )
@@ -54,11 +54,10 @@ WHERE _rn = 1;
 
 
 -- -----------------------------------------------------------------------------
--- dim_machine_curr: Active machine dimension records (open-ended SCD2 rows)
+-- dim_machine: Current machine attributes (view over silver SCD1)
 -- -----------------------------------------------------------------------------
-CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_curr
-CLUSTER BY (machine_id)
-COMMENT "Current active machine dimension - latest attributes for every machine"
+CREATE OR REPLACE VIEW ${gold_schema}.dim_machine
+COMMENT "Current machine dimension - latest attributes for every machine"
 TBLPROPERTIES ("quality" = "gold")
 AS
 SELECT
@@ -71,16 +70,14 @@ SELECT
   machine_status,
   max_temperature,
   max_pressure,
-  __START_AT AS valid_from
-FROM ${silver_schema}.dim_machine
-WHERE __END_AT IS NULL;
+  machine_timestamp
+FROM ${silver_schema}.dim_machine;
 
 
 -- -----------------------------------------------------------------------------
 -- fact_sensor: Silver sensor readings with machine_date column
 -- -----------------------------------------------------------------------------
-CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor
-CLUSTER BY (machine_id, machine_date)
+CREATE OR REPLACE VIEW ${gold_schema}.fact_sensor
 COMMENT "Sensor readings from silver with machine_date derived from timestamp"
 TBLPROPERTIES ("quality" = "gold")
 AS
