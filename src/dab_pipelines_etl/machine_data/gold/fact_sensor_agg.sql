@@ -1,4 +1,7 @@
 -- Daily aggregations of sensor readings per machine
+-- Schema is explicitly defined to declare PK and FK constraints.
+-- Note: specifying a column list locks schema evolution — new columns in the
+-- SELECT require a matching update here.
 CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor_agg (
   machine_date            DATE    NOT NULL,
   machine_id              STRING  NOT NULL,

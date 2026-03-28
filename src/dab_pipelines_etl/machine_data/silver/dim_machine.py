@@ -25,6 +25,9 @@ def tmp_machine_dim_source():
 
 
 # SCD Type 1 - current state (overwrites on change)
+# Schema is explicitly defined to declare a PRIMARY KEY constraint.
+# Note: specifying schema= locks schema evolution — new source columns won't
+# propagate automatically and require a manual schema update here.
 dp.create_streaming_table(
     name=f"{cfg.silver_schema}.dim_machine",
     schema="""
@@ -54,6 +57,8 @@ dp.create_auto_cdc_flow(
 )
 
 # SCD Type 2 - full change history
+# Schema is explicitly defined to declare a composite PRIMARY KEY on
+# (machine_id, __START_AT) — the SCD2-generated validity start column.
 dp.create_streaming_table(
     name=f"{cfg.silver_schema}.dim_machine_history",
     schema="""
