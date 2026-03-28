@@ -8,12 +8,7 @@ from dab_pipelines import df_utils
 from dab_pipelines_etl.machine_data import pipeline_config as cfg
 
 
-@dp.table(
-    name=f"{cfg.silver_schema}.fact_sensor",
-    comment="Cleaned and enriched sensor readings fact table",
-    table_properties={"quality": "silver"},
-    cluster_by=["machine_id", "machine_timestamp"],
-)
+@dp.temporary_view()
 @dp.expect_all_or_drop(
     {
         "valid_reading_id": "reading_id IS NOT NULL",
@@ -25,17 +20,13 @@ from dab_pipelines_etl.machine_data import pipeline_config as cfg
 @dp.expect_or_drop("reasonable_pressure", "pressure >= 0")
 @dp.expect_or_drop("reasonable_vibration", "vibration >= 0")
 @dp.expect_or_drop("reasonable_power", "power_consumption >= 0")
-def fact_sensor():
-    """Create cleaned sensor facts table with data quality checks.
-
-    Applies data quality expectations to:
-    - Require valid IDs and timestamps
-    - Validate sensor readings are within reasonable ranges
+def tmp_fact_sensor_source():
+    """Source view for sensor fact data with data quality checks applied.
 
     Returns
     -------
     DataFrame
-        Cleaned sensor facts.
+        Cleaned sensor facts ready for ingestion into the silver table.
     """
     df = spark.readStream.table(f"{cfg.raw_schema}.sensor_facts")
     df = df_utils.drop_technical_columns(df)
@@ -52,3 +43,36 @@ def fact_sensor():
     )
 
     return df
+
+
+dp.create_streaming_table(
+    name=f"{cfg.silver_schema}.fact_sensor",
+    schema=f"""
+        reading_id           STRING    NOT NULL,
+        machine_id           STRING    NOT NULL,
+        machine_timestamp    TIMESTAMP NOT NULL,
+        temperature          DOUBLE,
+        pressure             DOUBLE,
+        vibration            DOUBLE,
+        power_consumption    DOUBLE,
+        error_code           STRING,
+        is_anomaly           BOOLEAN,
+        is_high_temperature  BOOLEAN,
+        is_high_pressure     BOOLEAN,
+        is_high_vibration    BOOLEAN,
+        _loading_ts          TIMESTAMP,
+        CONSTRAINT pk_fact_sensor PRIMARY KEY (reading_id),
+        CONSTRAINT fk_fact_sensor_machine_id FOREIGN KEY (machine_id) REFERENCES {cfg.silver_schema}.dim_machine(machine_id)
+    """,
+    comment="Cleaned and enriched sensor readings fact table",
+    table_properties={"quality": "silver"},
+    cluster_by=["machine_id", "machine_timestamp"],
+)
+
+dp.create_auto_cdc_flow(
+    target=f"{cfg.silver_schema}.fact_sensor",
+    source="tmp_fact_sensor_source",
+    keys=["reading_id"],
+    sequence_by="machine_timestamp",
+    stored_as_scd_type=1,
+)

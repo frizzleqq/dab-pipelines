@@ -1,5 +1,32 @@
 -- Daily aggregations of sensor readings per machine
-CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor_agg
+CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor_agg (
+  machine_date            DATE    NOT NULL,
+  machine_id              STRING  NOT NULL,
+  machine_name            STRING,
+  machine_location        STRING,
+  machine_type            STRING,
+  machine_status          STRING,
+  total_readings          BIGINT,
+  anomaly_count           BIGINT,
+  high_temp_count         BIGINT,
+  high_pressure_count     BIGINT,
+  high_vibration_count    BIGINT,
+  avg_temperature         DOUBLE,
+  min_temperature         DOUBLE,
+  max_temperature         DOUBLE,
+  avg_pressure            DOUBLE,
+  min_pressure            DOUBLE,
+  max_pressure            DOUBLE,
+  avg_vibration           DOUBLE,
+  min_vibration           DOUBLE,
+  max_vibration           DOUBLE,
+  avg_power_consumption   DOUBLE,
+  min_power_consumption   DOUBLE,
+  max_power_consumption   DOUBLE,
+  total_power_consumption DOUBLE,
+  CONSTRAINT pk_fact_sensor_agg PRIMARY KEY (machine_date, machine_id),
+  CONSTRAINT fk_fact_sensor_agg_dim_machine_daily FOREIGN KEY (machine_id, machine_date) REFERENCES ${gold_schema}.dim_machine_daily(machine_id, machine_date)
+)
 CLUSTER BY (machine_id, machine_date)
 COMMENT "Daily aggregated sensor metrics per machine"
 TBLPROPERTIES ("quality" = "gold")
