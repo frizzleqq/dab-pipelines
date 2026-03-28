@@ -13,6 +13,10 @@ variables:
     description: The schema to use
   service_principal_id:
     description: The service principal ID to use for running jobs (auto-lookup).
+  warehouse_id:
+    description: SQL warehouse used by dashboards.
+    lookup:
+      warehouse: "Serverless Starter Warehouse"
 
 include:
   - resources/*.yml
