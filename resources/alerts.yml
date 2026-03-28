@@ -1,0 +1,27 @@
+# SQL Alerts for machine data monitoring.
+
+resources:
+  alerts:
+    high_anomaly_rate:
+      display_name: "Machine Data - High Anomaly Rate"
+      query_text: >-
+        SELECT ROUND(SUM(anomaly_count) * 100.0 / NULLIF(SUM(total_readings), 0), 1) AS anomaly_rate_pct
+        FROM ${var.catalog}.${resources.schemas.schema_gold.name}.fact_sensor_agg
+        WHERE machine_date = date_sub(current_date(), 1)
+      warehouse_id: ${var.warehouse_id}
+
+      evaluation:
+        comparison_operator: GREATER_THAN
+        source:
+          name: anomaly_rate_pct
+          display: anomaly_rate_pct
+        threshold:
+          value:
+            double_value: 20
+        notification:
+          notify_on_ok: false
+
+      schedule:
+        pause_status: UNPAUSED
+        quartz_cron_schedule: "0 0 8 * * ?"
+        timezone_id: "UTC"
