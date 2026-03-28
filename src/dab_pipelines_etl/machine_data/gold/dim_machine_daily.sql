@@ -1,6 +1,23 @@
 -- One row per machine per calendar day (2020-01-01 → today)
 -- Uses the SCD2 validity window to resolve which version was active on each day.
-CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily
+-- Schema is explicitly defined to declare a PRIMARY KEY constraint.
+-- Note: specifying a column list locks schema evolution — new columns in the
+-- SELECT require a matching update here.
+CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily (
+  machine_id        STRING    NOT NULL,
+  machine_date      DATE      NOT NULL,
+  machine_name      STRING,
+  machine_location  STRING,
+  machine_type      STRING,
+  manufacturer      STRING,
+  installation_date TIMESTAMP,
+  machine_status    STRING,
+  max_temperature   DOUBLE,
+  max_pressure      DOUBLE,
+  valid_from        TIMESTAMP NOT NULL,
+  valid_to          TIMESTAMP,
+  CONSTRAINT pk_dim_machine_daily PRIMARY KEY (machine_id, machine_date)
+)
 CLUSTER BY (machine_id, machine_date)
 COMMENT "One row per machine per calendar day from 2020-01-01 to current date, showing the machine attributes that were valid on that day according to the SCD2 history"
 TBLPROPERTIES ("quality" = "gold")

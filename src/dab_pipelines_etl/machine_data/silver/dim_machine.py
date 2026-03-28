@@ -25,8 +25,24 @@ def tmp_machine_dim_source():
 
 
 # SCD Type 1 - current state (overwrites on change)
+# Schema is explicitly defined to declare a PRIMARY KEY constraint.
+# Note: specifying schema= locks schema evolution — new source columns won't
+# propagate automatically and require a manual schema update here.
 dp.create_streaming_table(
     name=f"{cfg.silver_schema}.dim_machine",
+    schema="""
+        machine_id        STRING    NOT NULL,
+        machine_name      STRING,
+        machine_location  STRING,
+        machine_type      STRING,
+        manufacturer      STRING,
+        installation_date TIMESTAMP,
+        machine_status    STRING,
+        max_temperature   DOUBLE,
+        max_pressure      DOUBLE,
+        machine_timestamp TIMESTAMP,
+        CONSTRAINT pk_dim_machine PRIMARY KEY (machine_id)
+    """,
     comment="Machine dimension with SCD Type 1 (current state only)",
     table_properties={"quality": "silver"},
     cluster_by=["machine_id"],
@@ -41,8 +57,25 @@ dp.create_auto_cdc_flow(
 )
 
 # SCD Type 2 - full change history
+# Schema is explicitly defined to declare a composite PRIMARY KEY on
+# (machine_id, __START_AT) — the SCD2-generated validity start column.
 dp.create_streaming_table(
     name=f"{cfg.silver_schema}.dim_machine_history",
+    schema="""
+        machine_id        STRING    NOT NULL,
+        machine_name      STRING,
+        machine_location  STRING,
+        machine_type      STRING,
+        manufacturer      STRING,
+        installation_date TIMESTAMP,
+        machine_status    STRING,
+        max_temperature   DOUBLE,
+        max_pressure      DOUBLE,
+        machine_timestamp TIMESTAMP,
+        __START_AT        TIMESTAMP NOT NULL,
+        __END_AT          TIMESTAMP,
+        CONSTRAINT pk_dim_machine_history PRIMARY KEY (machine_id, __START_AT)
+    """,
     comment="Machine dimension with SCD Type 2 tracking historical changes",
     table_properties={"quality": "silver"},
     cluster_by=["machine_id"],
