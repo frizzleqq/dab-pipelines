@@ -1,8 +1,6 @@
 -- One row per machine per calendar day (2020-01-01 → today)
 -- Uses the SCD2 validity window to resolve which version was active on each day.
 -- Schema is explicitly defined to declare a PRIMARY KEY constraint.
--- Note: specifying a column list locks schema evolution — new columns in the
--- SELECT require a matching update here.
 CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily (
   machine_id        STRING    NOT NULL COMMENT "Unique identifier of the machine",
   machine_date      DATE      NOT NULL COMMENT "Calendar date this row represents",

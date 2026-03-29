@@ -16,6 +16,7 @@ This repo deploys a Databricks Asset Bundle.
 - Run code checks: `uv run ruff check --fix`
 - Check code formatting: `uv run ruff format`
 - Run tests: `uv run pytest -v`
+- Deploy to dev: `databricks bundle deploy`
 
 ## Code Style
 - Google Python Style Guide
