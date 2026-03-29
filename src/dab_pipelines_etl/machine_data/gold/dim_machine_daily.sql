@@ -4,18 +4,18 @@
 -- Note: specifying a column list locks schema evolution — new columns in the
 -- SELECT require a matching update here.
 CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily (
-  machine_id        STRING    NOT NULL,
-  machine_date      DATE      NOT NULL,
-  machine_name      STRING,
-  machine_location  STRING,
-  machine_type      STRING,
-  manufacturer      STRING,
-  installation_date TIMESTAMP,
-  machine_status    STRING,
-  max_temperature   DOUBLE,
-  max_pressure      DOUBLE,
-  valid_from        TIMESTAMP NOT NULL,
-  valid_to          TIMESTAMP,
+  machine_id        STRING    NOT NULL COMMENT "Unique identifier of the machine",
+  machine_date      DATE      NOT NULL COMMENT "Calendar date this row represents",
+  machine_name      STRING             COMMENT "Human-readable name of the machine",
+  machine_location  STRING             COMMENT "Physical location of the machine",
+  machine_type      STRING             COMMENT "Category or type of the machine",
+  manufacturer      STRING             COMMENT "Manufacturer of the machine",
+  installation_date TIMESTAMP          COMMENT "Date the machine was installed",
+  machine_status    STRING             COMMENT "Operational status of the machine",
+  max_temperature   DOUBLE             COMMENT "Maximum allowed temperature threshold",
+  max_pressure      DOUBLE             COMMENT "Maximum allowed pressure threshold",
+  valid_from        TIMESTAMP NOT NULL COMMENT "SCD2 start of validity for this version",
+  valid_to          TIMESTAMP          COMMENT "SCD2 end of validity, null if current",
   CONSTRAINT pk_dim_machine_daily PRIMARY KEY (machine_id, machine_date)
 )
 CLUSTER BY (machine_id, machine_date)
