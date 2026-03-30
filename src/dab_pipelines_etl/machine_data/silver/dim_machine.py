@@ -29,6 +29,7 @@ def tmp_machine_dim_source():
 dp.create_streaming_table(
     name=f"{cfg.silver_schema}.dim_machine",
     schema="""
+        machine_surrogate_key BIGINT GENERATED ALWAYS AS IDENTITY COMMENT 'Surrogate key for the machine dimension',
         machine_id        STRING    NOT NULL COMMENT 'Unique identifier of the machine',
         machine_name      STRING             COMMENT 'Human-readable name of the machine',
         machine_location  STRING             COMMENT 'Physical location of the machine',
