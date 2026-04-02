@@ -16,4 +16,5 @@ data_output/
 .ai-dev-kit/
 .github/skills/
 .mcp.json
+.mcp.json.bak
 .vscode/mcp.json
