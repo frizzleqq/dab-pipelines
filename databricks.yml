@@ -27,7 +27,6 @@ artifacts:
     type: whl
     build: uv build --wheel
 
-
 # default permissions, can also be set per target
 permissions:
   - level: CAN_MANAGE
