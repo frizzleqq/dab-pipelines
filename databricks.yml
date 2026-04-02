@@ -54,14 +54,13 @@ targets:
   test:
     mode: production
     presets:
-      name_prefix: ""
       trigger_pause_status: PAUSED
     workspace:
       host: https://dbc-ea4bb8e5-6935.cloud.databricks.com
       root_path: /Workspace/bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lake_test
-      schema: test
+      schema: default
       service_principal_id:
         # lookup the dev service principal ID by name
         lookup:
@@ -78,7 +77,7 @@ targets:
       root_path: /Workspace/bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lake_prod
-      schema: prod
+      schema: default
       service_principal_id:
         # lookup the prod service principal ID by name
         lookup:
