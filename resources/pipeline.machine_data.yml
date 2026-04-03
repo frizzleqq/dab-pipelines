@@ -23,4 +23,4 @@ resources:
 
       environment:
         dependencies:
-          - "${workspace.artifact_path}/.internal/dab_pipelines*.whl"
+          - "${workspace.artifact_path}/.internal/*.whl"

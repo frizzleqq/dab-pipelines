@@ -3,7 +3,7 @@
 bundle:
   name: dab_pipelines
   uuid: 7fce30e5-a19d-4497-9aa9-d7f04d2a37a5
-  databricks_cli_version: ">=0.294.0"
+  databricks_cli_version: ">=0.286.0"
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
@@ -27,8 +27,10 @@ artifacts:
     type: whl
     build: uv build --wheel
 
-
+# default permissions, can also be set per target
 permissions:
+  - level: CAN_MANAGE
+    user_name: ${workspace.current_user.userName}
   - level: CAN_MANAGE
     group_name: group_etl 
   - level: CAN_VIEW
@@ -52,14 +54,13 @@ targets:
   test:
     mode: production
     presets:
-      name_prefix: ""
       trigger_pause_status: PAUSED
     workspace:
       host: https://dbc-ea4bb8e5-6935.cloud.databricks.com
       root_path: /Workspace/bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lake_test
-      schema: test
+      schema: default
       service_principal_id:
         # lookup the dev service principal ID by name
         lookup:
@@ -76,7 +77,7 @@ targets:
       root_path: /Workspace/bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lake_prod
-      schema: prod
+      schema: default
       service_principal_id:
         # lookup the prod service principal ID by name
         lookup:

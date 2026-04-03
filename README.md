@@ -6,8 +6,7 @@ The data is generated using `faker`.
 * `src/`: Python source code for this project.
   * `src/dab_pipelines/`: Shared Python code that can be used by jobs and pipelines.
   * `src/dab_pipelines_etl/`: Spark Declarative pipelines organised by domain and medallion layer.
-  * `src/dashboards/`: AI/BI dashboard definitions (`.lvdash.json`)
-* `resources/`: Resource configurations (jobs, pipelines, UC schemas, volumes, dashboards, alerts)
+* `resources/`: Resource configurations (jobs, pipelines, UC schemas, volumes, alerts)
 * `tests/`: Unit tests for the shared Python code.
 
 
