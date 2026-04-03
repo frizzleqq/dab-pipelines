@@ -16,7 +16,6 @@ This repo deploys a Databricks Asset Bundle.
 - Run code checks: `uv run ruff check --fix`
 - Check code formatting: `uv run ruff format`
 - Run tests: `uv run pytest -v`
-- To run Python code prefix with: `uv run ...`
 
 ## Code Style
 - Google Python Style Guide
