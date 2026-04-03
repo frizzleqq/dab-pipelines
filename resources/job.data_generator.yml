@@ -19,8 +19,17 @@ resources:
         - name: seed
           default: "42"
 
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              # Include the wheel file and dependencies
+              - ../dist/*.whl
+
       tasks:
         - task_key: generate_synthetic_data
+          environment_key: default
           python_wheel_task:
             package_name: dab_pipelines
             entry_point: main
@@ -40,12 +49,3 @@ resources:
               - "{{job.parameters.num_readings}}"
               - "--seed"
               - "{{job.parameters.seed}}"
-          environment_key: default
-
-      environments:
-        - environment_key: default
-          spec:
-            environment_version: "4"
-            dependencies:
-              # Include the wheel file and dependencies
-              - ../dist/*.whl

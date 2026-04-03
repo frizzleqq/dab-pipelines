@@ -29,4 +29,3 @@ This repo deploys a Databricks Asset Bundle.
 * Default Catalog: `lake_dev`
 * Schemas for tables: `raw`, `silver`, `gold`
   * In dev target my personal schemas are prefixed with `dev_${workspace.current_user.short_name}`
-* Source-Data can be found in `raw` schemas

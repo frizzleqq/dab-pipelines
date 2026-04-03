@@ -3,7 +3,7 @@
 bundle:
   name: dab_pipelines
   uuid: 7fce30e5-a19d-4497-9aa9-d7f04d2a37a5
-  databricks_cli_version: ">=0.294.0"
+  databricks_cli_version: ">=0.286.0"
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
