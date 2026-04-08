@@ -69,3 +69,4 @@ convention = "numpy"
 
 [tool.uv]
 python-downloads = "automatic"
+exclude-newer = "7 days"
