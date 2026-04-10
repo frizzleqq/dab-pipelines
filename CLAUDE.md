@@ -32,8 +32,8 @@ This repo deploys a Databricks Asset Bundle.
 
 ## Naming conventions
 - tables: lowercase letters, numbers and underscores
-  - `gold` dimension tables: prefixed with `dim_`, suffixed with `_a` (SCD1) or `_h` (SCD2)
-  - `gold` fact tables: prefixed with `fact_`
+  - dimension tables: prefixed with `dim_`, suffixed with `_a` (SCD1) or `_h` (SCD2)
+  - fact tables: prefixed with `fact_`
 - columns:
   - lowercase letters, numbers and underscores
   - surrogate keys (identity): optional, suffixed with `_sk`
