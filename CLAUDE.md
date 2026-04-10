@@ -30,7 +30,7 @@ This repo deploys a Databricks Asset Bundle.
 - Schemas for tables: `raw`, `silver`, `gold`
   - In dev target my personal schemas are prefixed with `dev_${workspace.current_user.short_name}`
 
-## Naming conventions
+## Naming conventions for silver/gold
 - tables: lowercase letters, numbers and underscores
   - dimension tables: prefixed with `dim_`, suffixed with `_a` (SCD1) or `_h` (SCD2)
   - fact tables: prefixed with `fact_`
