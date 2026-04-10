@@ -3,6 +3,7 @@
 CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.fact_sensor_agg (
   machine_date            DATE    NOT NULL COMMENT "Date of the aggregation period",
   machine_id              STRING  NOT NULL COMMENT "Unique identifier of the machine",
+  machine_sk              BIGINT           COMMENT 'Surrogate key referencing the history record active on this date',
   machine_name            STRING           COMMENT "Human-readable name of the machine",
   machine_location        STRING           COMMENT "Physical location of the machine",
   machine_type            STRING           COMMENT "Category or type of the machine",
@@ -35,6 +36,7 @@ AS
 SELECT
   CAST(f.machine_timestamp AS DATE) AS machine_date,
   f.machine_id,
+  m.machine_sk,
   m.machine_name,
   m.machine_location,
   m.machine_type,
@@ -69,6 +71,7 @@ LEFT JOIN ${gold_schema}.dim_machine_daily AS m
 GROUP BY
   CAST(f.machine_timestamp AS DATE),
   f.machine_id,
+  m.machine_sk,
   m.machine_name,
   m.machine_location,
   m.machine_type,

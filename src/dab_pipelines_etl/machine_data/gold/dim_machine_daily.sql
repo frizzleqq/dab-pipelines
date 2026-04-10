@@ -4,6 +4,7 @@
 CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily (
   machine_id        STRING    NOT NULL COMMENT "Unique identifier of the machine",
   machine_date      DATE      NOT NULL COMMENT "Calendar date this row represents",
+  machine_sk        BIGINT             COMMENT 'Surrogate key referencing the source history record',
   machine_name      STRING             COMMENT "Human-readable name of the machine",
   machine_location  STRING             COMMENT "Physical location of the machine",
   machine_type      STRING             COMMENT "Category or type of the machine",
@@ -26,6 +27,7 @@ WITH date_spine AS (
 ranked AS (
   SELECT
     d.machine_date,
+    m.machine_sk,
     m.machine_id,
     m.machine_name,
     m.machine_location,
@@ -49,6 +51,7 @@ ranked AS (
 SELECT
   machine_id,
   machine_date,
+  machine_sk,
   machine_name,
   machine_location,
   machine_type,

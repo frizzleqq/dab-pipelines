@@ -26,7 +26,14 @@ This repo deploys a Databricks Asset Bundle.
 - Prefer: `from pyspark.sql import functions as F, types as T`
 
 ## Data Structure
-
 - Default Catalog: `lake_dev`
 - Schemas for tables: `raw`, `silver`, `gold`
   - In dev target my personal schemas are prefixed with `dev_${workspace.current_user.short_name}`
+
+## Naming conventions
+- tables: lowercase letters, numbers and underscores
+  - `gold` dimension tables: prefixed with `dim_`, suffixed with `_a` (SCD1) or `_h` (SCD2)
+  - `gold` fact tables: prefixed with `fact_`
+- columns:
+  - lowercase letters, numbers and underscores
+  - surrogate keys (identity): optional, suffixed with `_sk`
