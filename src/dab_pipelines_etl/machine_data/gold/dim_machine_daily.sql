@@ -2,6 +2,7 @@
 -- Uses the SCD2 validity window to resolve which version was active on each day.
 -- Schema is explicitly defined to declare a PRIMARY KEY constraint.
 CREATE OR REFRESH MATERIALIZED VIEW ${gold_schema}.dim_machine_daily (
+  machine_sk        BIGINT    NOT NULL COMMENT "Surrogate key from the SCD2 history table",
   machine_id        STRING    NOT NULL COMMENT "Unique identifier of the machine",
   machine_date      DATE      NOT NULL COMMENT "Calendar date this row represents",
   machine_name      STRING             COMMENT "Human-readable name of the machine",
@@ -26,6 +27,7 @@ WITH date_spine AS (
 ranked AS (
   SELECT
     d.machine_date,
+    m.machine_sk,
     m.machine_id,
     m.machine_name,
     m.machine_location,
@@ -42,11 +44,12 @@ ranked AS (
       ORDER BY m.__START_AT DESC
     ) AS _rn
   FROM date_spine AS d
-  JOIN ${silver_schema}.dim_machine_history AS m
+  JOIN ${silver_schema}.dim_machine_h AS m
     ON CAST(m.__START_AT AS DATE) <= d.machine_date
    AND (m.__END_AT IS NULL OR CAST(m.__END_AT AS DATE) > d.machine_date)
 )
 SELECT
+  machine_sk,
   machine_id,
   machine_date,
   machine_name,
