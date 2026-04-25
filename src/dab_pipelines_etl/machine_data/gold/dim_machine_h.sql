@@ -11,8 +11,9 @@ CREATE OR REPLACE VIEW ${gold_schema}.dim_machine_h (
   max_temperature   COMMENT "Maximum allowed temperature threshold",
   max_pressure      COMMENT "Maximum allowed pressure threshold",
   machine_timestamp COMMENT "Timestamp of the last source record",
-  __START_AT        COMMENT "SCD2 start of validity for this version",
-  __END_AT          COMMENT "SCD2 end of validity, null if current"
+  valid_from_ts     COMMENT "SCD2 start of validity for this version",
+  valid_to_ts       COMMENT "SCD2 end of validity, null if current",
+  is_current        COMMENT "True if this is the currently active version"
 )
 COMMENT "Full history of machine dimension changes (SCD Type 2), sourced from silver"
 TBLPROPERTIES ("quality" = "gold")
@@ -29,6 +30,7 @@ SELECT
   max_temperature,
   max_pressure,
   machine_timestamp,
-  __START_AT,
-  __END_AT
+  __START_AT               AS valid_from_ts,
+  __END_AT                 AS valid_to_ts,
+  (__END_AT IS NULL)       AS is_current
 FROM ${silver_schema}.dim_machine_h;

@@ -10,7 +10,7 @@ sensor_data = create_autoloader_table(
         "table_name": f"{cfg.bronze_schema}.sensor_data",
         "comment": "Sensor data loaded via autoloader from Unity Catalog Volume",
         "source_path": "sensor_data",
-        "cluster_by": ["machine_id", "timestamp"],
+        "cluster_by": ["_loading_ts", "machine_id"],
         "schema": T.StructType(
             [
                 T.StructField("reading_id", T.StringType(), nullable=False),

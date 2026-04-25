@@ -38,6 +38,7 @@ Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](
 
 * uv: https://docs.astral.sh/uv/getting-started/installation/
 * Databricks CLI: https://docs.databricks.com/aws/en/dev-tools/cli/install
+* (Optional) ai-dev-kit: https://github.com/databricks-solutions/ai-dev-kit
 
 ### Getting started
 

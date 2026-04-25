@@ -12,7 +12,10 @@ scratch/**
 data_output/
 
 # AI tooling
-.claude/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/medallion-pipeline/
 .ai-dev-kit/
 .github/skills/
 .mcp.json
