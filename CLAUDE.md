@@ -30,3 +30,9 @@ This repo deploys a Databricks Asset Bundle.
 - Default Catalog: `lake_dev`
 - Schemas for tables: `bronze`, `silver`, `gold`
   - In dev target my personal schemas are prefixed with `dev_${workspace.current_user.short_name}`
+
+  ## Naming Conventions
+
+- Dimension tables: `dim_` prefix, `_a` suffix (SCD1/current) or `_h` suffix (SCD2/history)
+- Fact tables: `fact_` prefix
+- Surrogate keys: `_sk` suffix

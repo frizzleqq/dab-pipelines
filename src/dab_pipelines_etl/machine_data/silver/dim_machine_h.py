@@ -46,7 +46,7 @@ dp.create_streaming_table(
     """,
     comment="Machine dimension with SCD Type 2 tracking historical changes",
     table_properties={"quality": "silver"},
-    cluster_by=["machine_id"],
+    cluster_by=["machine_id", "machine_sk"],
 )
 
 dp.create_auto_cdc_flow(

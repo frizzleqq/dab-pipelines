@@ -10,7 +10,7 @@ machine_metadata = create_autoloader_table(
         "table_name": f"{cfg.bronze_schema}.machine_metadata",
         "comment": "Machine metadata loaded via autoloader from Unity Catalog Volume",
         "source_path": "machine_metadata",
-        "cluster_by": ["machine_id"],
+        "cluster_by": ["_loading_ts", "machine_id"],
         "schema": T.StructType(
             [
                 T.StructField("machine_id", T.StringType(), nullable=False),
