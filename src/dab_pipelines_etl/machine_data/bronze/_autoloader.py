@@ -1,4 +1,4 @@
-"""Autoloader factory for creating raw streaming ingest tables."""
+"""Autoloader factory for creating bronze streaming ingest tables."""
 
 from typing import Callable
 
@@ -28,7 +28,7 @@ def create_autoloader_table(config: dict) -> Callable:
     @dp.table(
         name=config["table_name"],
         comment=config["comment"],
-        table_properties={"quality": "raw"},
+        table_properties={"quality": "bronze"},
         cluster_by=config["cluster_by"],
     )
     def _table_function():

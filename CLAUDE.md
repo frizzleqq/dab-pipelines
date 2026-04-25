@@ -28,5 +28,5 @@ This repo deploys a Databricks Asset Bundle.
 ## Data Structure
 
 - Default Catalog: `lake_dev`
-- Schemas for tables: `raw`, `silver`, `gold`
+- Schemas for tables: `bronze`, `silver`, `gold`
   - In dev target my personal schemas are prefixed with `dev_${workspace.current_user.short_name}`

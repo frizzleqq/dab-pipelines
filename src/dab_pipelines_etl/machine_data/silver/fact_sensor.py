@@ -37,7 +37,7 @@ def fact_sensor():
     DataFrame
         Cleaned sensor facts.
     """
-    df = spark.readStream.table(f"{cfg.raw_schema}.sensor_facts")
+    df = spark.readStream.table(f"{cfg.bronze_schema}.sensor_data")
     df = df_utils.drop_technical_columns(df)
 
     df = df.withColumnRenamed("timestamp", "machine_timestamp")

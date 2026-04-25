@@ -84,17 +84,19 @@ def create_machine_example_schemas(num_machines: int = 10, num_sensor_readings: 
     Returns
     -------
     list[DatasetSchema]
-        List of dataset schemas (machine_dim, sensor_facts).
+        List of dataset schemas (machine_metadata, sensor_data).
     """
     # Generate machine IDs to be shared across datasets
     machine_ids = [f"MACH-{i:04d}" for i in range(1, num_machines + 1)]
     now_utc = datetime.now(tz=UTC)
-    min_timestamp = (now_utc - timedelta(days=7)).isoformat()
-    max_timestamp = now_utc.isoformat()
+    dim_min_timestamp = (now_utc - timedelta(days=30)).isoformat()
+    dim_max_timestamp = (now_utc - timedelta(days=8)).isoformat()
+    fact_min_timestamp = (now_utc - timedelta(days=7)).isoformat()
+    fact_max_timestamp = now_utc.isoformat()
 
-    # Machine dimension schema
-    machine_dim_schema = DatasetSchema(
-        name="machine_dim",
+    # Machine metadata schema
+    machine_metadata_schema = DatasetSchema(
+        name="machine_metadata",
         num_records=num_machines,
         fields=[
             FieldSchema(name="machine_id", field_type="reference", reference_pool=machine_ids, reference_unique=True),
@@ -109,7 +111,9 @@ def create_machine_example_schemas(num_machines: int = 10, num_sensor_readings: 
             FieldSchema(
                 name="installation_date", field_type="datetime", min_value="2020-01-01", max_value="2025-12-31"
             ),
-            FieldSchema(name="timestamp", field_type="datetime", min_value=min_timestamp, max_value=max_timestamp),
+            FieldSchema(
+                name="timestamp", field_type="datetime", min_value=dim_min_timestamp, max_value=dim_max_timestamp
+            ),
             FieldSchema(
                 name="status",
                 field_type="choice",
@@ -120,14 +124,16 @@ def create_machine_example_schemas(num_machines: int = 10, num_sensor_readings: 
         ],
     )
 
-    # Sensor facts schema
-    sensor_facts_schema = DatasetSchema(
-        name="sensor_facts",
+    # Sensor data schema
+    sensor_data_schema = DatasetSchema(
+        name="sensor_data",
         num_records=num_sensor_readings,
         fields=[
             FieldSchema(name="reading_id", field_type="uuid"),
             FieldSchema(name="machine_id", field_type="reference", reference_pool=machine_ids),
-            FieldSchema(name="timestamp", field_type="datetime", min_value=min_timestamp, max_value=max_timestamp),
+            FieldSchema(
+                name="timestamp", field_type="datetime", min_value=fact_min_timestamp, max_value=fact_max_timestamp
+            ),
             FieldSchema(name="temperature", field_type="float", min_value=20.0, max_value=180.0),
             FieldSchema(name="pressure", field_type="float", min_value=1.0, max_value=45.0),
             FieldSchema(name="vibration", field_type="float", min_value=0.0, max_value=10.0),
@@ -143,4 +149,4 @@ def create_machine_example_schemas(num_machines: int = 10, num_sensor_readings: 
         ],
     )
 
-    return [machine_dim_schema, sensor_facts_schema]
+    return [machine_metadata_schema, sensor_data_schema]

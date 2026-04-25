@@ -13,10 +13,10 @@ resources:
         - principal: group_reader
           privileges: [USE_SCHEMA]
 
-    schema_raw:
+    schema_bronze:
       catalog_name: ${var.catalog}
-      name: raw
-      comment: "Raw ingested data via Auto Loader"
+      name: bronze
+      comment: "Bronze ingested data via Auto Loader"
       grants:
         - principal: group_etl
           privileges: [ALL_PRIVILEGES]

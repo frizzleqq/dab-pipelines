@@ -63,8 +63,8 @@ generator.generate_and_save(schemas, "data_output/synthetic_data")
 ```
 
 This generates two files:
-- `machine_dim.json`: Machine metadata (dimension table)
-- `sensor_facts.json`: Sensor readings (fact table)
+- `machine_metadata.json`: Machine metadata
+- `sensor_data.json`: Sensor readings
 
 ### Command Line
 

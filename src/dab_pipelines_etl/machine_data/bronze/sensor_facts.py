@@ -1,15 +1,15 @@
-"""Raw sensor facts table loaded via autoloader."""
+"""Bronze sensor data table loaded via autoloader."""
 
 from pyspark.sql import types as T
 
 from dab_pipelines_etl.machine_data import pipeline_config as cfg
-from dab_pipelines_etl.machine_data.raw._autoloader import create_autoloader_table
+from dab_pipelines_etl.machine_data.bronze._autoloader import create_autoloader_table
 
-sensor_facts = create_autoloader_table(
+sensor_data = create_autoloader_table(
     {
-        "table_name": f"{cfg.raw_schema}.sensor_facts",
-        "comment": "Sensor facts data loaded via autoloader from Unity Catalog Volume",
-        "source_path": "sensor_facts",
+        "table_name": f"{cfg.bronze_schema}.sensor_data",
+        "comment": "Sensor data loaded via autoloader from Unity Catalog Volume",
+        "source_path": "sensor_data",
         "cluster_by": ["machine_id", "timestamp"],
         "schema": T.StructType(
             [

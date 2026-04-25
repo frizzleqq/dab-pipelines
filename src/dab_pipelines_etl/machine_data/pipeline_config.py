@@ -2,7 +2,7 @@
 
 from databricks.sdk.runtime import spark
 
-raw_schema = spark.conf.get("raw_schema")
+bronze_schema = spark.conf.get("bronze_schema")
 silver_schema = spark.conf.get("silver_schema")
 gold_schema = spark.conf.get("gold_schema")
 machine_uploads_base = spark.conf.get("machine_uploads_base")

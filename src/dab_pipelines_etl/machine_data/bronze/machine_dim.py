@@ -1,15 +1,15 @@
-"""Raw machine dimension table loaded via autoloader."""
+"""Bronze machine metadata table loaded via autoloader."""
 
 from pyspark.sql import types as T
 
 from dab_pipelines_etl.machine_data import pipeline_config as cfg
-from dab_pipelines_etl.machine_data.raw._autoloader import create_autoloader_table
+from dab_pipelines_etl.machine_data.bronze._autoloader import create_autoloader_table
 
-machine_dim = create_autoloader_table(
+machine_metadata = create_autoloader_table(
     {
-        "table_name": f"{cfg.raw_schema}.machine_dim",
-        "comment": "Machine dimension data loaded via autoloader from Unity Catalog Volume",
-        "source_path": "machine_dim",
+        "table_name": f"{cfg.bronze_schema}.machine_metadata",
+        "comment": "Machine metadata loaded via autoloader from Unity Catalog Volume",
+        "source_path": "machine_metadata",
         "cluster_by": ["machine_id"],
         "schema": T.StructType(
             [
