@@ -1,6 +1,6 @@
 [project]
 name = "dab_pipelines"
-version = "0.0.1"
+version = "0.2.0"
 description = "Databricks Asset Bundle using Spark Declarative Pipelines for ETL workloads"
 readme = "README.md"
 authors = [

@@ -202,8 +202,8 @@ class TestMachineExampleSchemas:
         schemas = create_machine_example_schemas(num_machines=5, num_sensor_readings=50)
 
         assert len(schemas) == 2
-        assert schemas[0].name == "machine_dim"
-        assert schemas[1].name == "sensor_facts"
+        assert schemas[0].name == "machine_metadata"
+        assert schemas[1].name == "sensor_data"
         assert schemas[0].num_records == 5
         assert schemas[1].num_records == 50
 
@@ -216,11 +216,11 @@ class TestMachineExampleSchemas:
         machine_id_field = next(f for f in schemas[0].fields if f.name == "machine_id")
         expected_machine_ids = set(machine_id_field.reference_pool)
 
-        machine_dim_data = generator.generate_dataset(schemas[0])
-        sensor_facts_data = generator.generate_dataset(schemas[1])
+        machine_metadata_data = generator.generate_dataset(schemas[0])
+        sensor_data_data = generator.generate_dataset(schemas[1])
 
-        machine_ids_dim = {record["machine_id"] for record in machine_dim_data}
-        machine_ids_facts = {record["machine_id"] for record in sensor_facts_data}
+        machine_ids_dim = {record["machine_id"] for record in machine_metadata_data}
+        machine_ids_facts = {record["machine_id"] for record in sensor_data_data}
 
         # Dimension table should have all machine IDs (unique references)
         assert machine_ids_dim == expected_machine_ids
@@ -228,8 +228,8 @@ class TestMachineExampleSchemas:
         # All sensor fact machine IDs should be from the reference pool
         assert machine_ids_facts.issubset(expected_machine_ids)
 
-    def test_machine_dim_structure(self):
-        """Test machine dimension data structure."""
+    def test_machine_metadata_structure(self):
+        """Test machine metadata data structure."""
         generator = SyntheticDataGenerator(seed=42)
         schemas = create_machine_example_schemas(num_machines=3, num_sensor_readings=10)
 
@@ -250,8 +250,8 @@ class TestMachineExampleSchemas:
 
         assert all(all(field in record for field in required_fields) for record in data)
 
-    def test_sensor_facts_structure(self):
-        """Test sensor facts data structure."""
+    def test_sensor_data_structure(self):
+        """Test sensor data structure."""
         generator = SyntheticDataGenerator(seed=42)
         schemas = create_machine_example_schemas(num_machines=3, num_sensor_readings=10)
 

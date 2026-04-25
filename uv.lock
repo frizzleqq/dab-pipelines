@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.12.*"
 
 [options]
-exclude-newer = "2026-04-01T19:17:25.718701819Z"
+exclude-newer = "2026-04-18T14:13:00.343176324Z"
 exclude-newer-span = "P7D"
 
 [[package]]
@@ -60,7 +60,7 @@ wheels = [
 
 [[package]]
 name = "dab-pipelines"
-version = "0.0.1"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "faker" },

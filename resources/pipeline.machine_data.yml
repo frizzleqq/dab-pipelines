@@ -15,7 +15,7 @@ resources:
             include: ../src/dab_pipelines_etl/machine_data/**
 
       configuration:
-        raw_schema: ${resources.schemas.schema_raw.name}
+        bronze_schema: ${resources.schemas.schema_bronze.name}
         silver_schema: ${resources.schemas.schema_silver.name}
         gold_schema: ${resources.schemas.schema_gold.name}
         machine_uploads_base: "/Volumes/${var.catalog}/${resources.schemas.schema_landing.name}/${resources.volumes.landing_machine_uploads.name}"
@@ -23,4 +23,6 @@ resources:
 
       environment:
         dependencies:
-          - "${workspace.artifact_path}/.internal/*.whl"
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}
