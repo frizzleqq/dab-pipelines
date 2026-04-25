@@ -38,8 +38,4 @@ def dim_machine_a():
     DataFrame
         One row per machine_id representing its current state.
     """
-    return (
-        spark.read.table(f"{cfg.silver_schema}.dim_machine_h")
-        .filter("__END_AT IS NULL")
-        .drop("__END_AT")
-    )
+    return spark.read.table(f"{cfg.silver_schema}.dim_machine_h").filter("__END_AT IS NULL").drop("__END_AT")

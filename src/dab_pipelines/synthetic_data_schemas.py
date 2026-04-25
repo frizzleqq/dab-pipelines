@@ -111,7 +111,9 @@ def create_machine_example_schemas(num_machines: int = 10, num_sensor_readings: 
             FieldSchema(
                 name="installation_date", field_type="datetime", min_value="2020-01-01", max_value="2025-12-31"
             ),
-            FieldSchema(name="timestamp", field_type="datetime", min_value=dim_min_timestamp, max_value=dim_max_timestamp),
+            FieldSchema(
+                name="timestamp", field_type="datetime", min_value=dim_min_timestamp, max_value=dim_max_timestamp
+            ),
             FieldSchema(
                 name="status",
                 field_type="choice",
@@ -129,7 +131,9 @@ def create_machine_example_schemas(num_machines: int = 10, num_sensor_readings: 
         fields=[
             FieldSchema(name="reading_id", field_type="uuid"),
             FieldSchema(name="machine_id", field_type="reference", reference_pool=machine_ids),
-            FieldSchema(name="timestamp", field_type="datetime", min_value=fact_min_timestamp, max_value=fact_max_timestamp),
+            FieldSchema(
+                name="timestamp", field_type="datetime", min_value=fact_min_timestamp, max_value=fact_max_timestamp
+            ),
             FieldSchema(name="temperature", field_type="float", min_value=20.0, max_value=180.0),
             FieldSchema(name="pressure", field_type="float", min_value=1.0, max_value=45.0),
             FieldSchema(name="vibration", field_type="float", min_value=0.0, max_value=10.0),
