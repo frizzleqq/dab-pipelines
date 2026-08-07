@@ -7,7 +7,7 @@
 ## Output Structure
 
 ```
-src/transformations/<domain>/
+src/dab_pipelines_etl/<domain>/
   gold/
     <dim_name>_a.sql          # SCD1 dimension view  (_a = current state)
     <dim_name>_h.sql          # SCD2 dimension view  (_h = full history, optional)
@@ -25,7 +25,7 @@ Drive the gold schema from existing silver files in the domain folder and the co
 Gold SCD2 dimensions are **plain views** (`CREATE OR REPLACE VIEW`) — silver already persists the data.
 
 Project-specific rules:
-- Name of view should be `gold`.<dim_name>_h`
+- Name of view should be `gold.<dim_name>_h`
 - Surrogate key `<dim_prefix>_sk` is pre-computed in silver
 - gold dimension views can't have primary keys
 - Rename `__START_AT` → `valid_from_ts`, `__END_AT` → `valid_to_ts` for `_h` views
@@ -38,9 +38,9 @@ Project-specific rules:
 Gold SCD1 dimensions are **materialized views** using the silver SCD2 dimension as a source.
 
 Project-specific rules:
-- Name of table should be `gold`.<dim_name>_a`
+- Name of table should be `gold.<dim_name>_a`
 - Use the silver SCD2 dimension as source and filter on current entries
-  - `__END_AT IS NULL"`
+  - `__END_AT IS NULL`
 
 ### 3. Fact views and materialized views (Python or SQL)
 

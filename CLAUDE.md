@@ -27,9 +27,10 @@ This repo deploys a Databricks Asset Bundle.
 
 ## Data Structure
 
-- Default Catalog: `lake_dev`
+- Catalogs: `lake_dev` (dev, default), `lake_test` (test), `lake_prod` (prod)
 - Schemas for tables: `bronze`, `silver`, `gold`
-  - In dev target my personal schemas are prefixed with `dev_${workspace.current_user.short_name}`
+  - In dev target resource names (jobs, pipeline, alert) are prefixed with `[dev ${workspace.current_user.short_name}] `; schemas are prefixed with `dev_${workspace.current_user.short_name}_`
+  - In test target resource names (jobs, pipeline, alert) are prefixed with `[test] `; schemas are prefixed with `test_`
 
   ## Naming Conventions
 

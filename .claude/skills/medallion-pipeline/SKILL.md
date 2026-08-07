@@ -27,7 +27,7 @@ Execute each layer in order (bronze → silver → gold). Read the full instruct
 
 Before generating any code, check:
   - `resources/*.yml` for existing bundle resources
-  - Any existing pipeline under `src/transformations/` or `resources/pipeline.*.yml` as a style reference
+  - Any existing pipeline under `src/dab_pipelines_etl/` or `resources/pipeline.*.yml` as a style reference
   - Use SDP instead of DLT: `from pyspark import pipelines as dp`
 
 ### You must understand source data before implementing new pipeline tables
@@ -48,11 +48,11 @@ resources:
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true
-      root_path: "../src/"
+      root_path: "../src"
 
       libraries:
         - glob:
-            include: ../src/transformations/<domain>/**
+            include: ../src/dab_pipelines_etl/<domain>/**
 
       configuration:
         bronze_schema: ${resources.schemas.schema_bronze.name}
@@ -64,12 +64,12 @@ resources:
           - --editable ${workspace.file_path}
 ```
 
-- The pipeline should use a `src\transformations\<domain>\pipeline_config.py` module to access pipeline configuration values:
+- The pipeline should use a `src/dab_pipelines_etl/<domain>/pipeline_config.py` module to access pipeline configuration values:
   - all pipeline tables and views must use the config values for schema names (e.g. `cfg.bronze_schema`) rather than hardcoding schema names
 
 ```python
 """Pipeline configuration values sourced from Databricks pipeline settings.
-- import the module as `from transformations.tpch import pipeline_config as cfg`
+- import the module as `from dab_pipelines_etl.<domain> import pipeline_config as cfg`
 """
 
 from databricks.sdk.runtime import spark
@@ -90,6 +90,6 @@ After all layers and the pipeline resource are written:
 
 ## Related Skills
 
-- **[databricks-spark-declarative-pipelines](../databricks-spark-declarative-pipelines/SKILL.md)** — SDP syntax, CDC/SCD patterns, streaming vs materialized views
-- **[databricks-bundles](../databricks-bundles/SKILL.md)** — DAB resource YAML and multi-environment deployment
-- **[databricks-unity-catalog](../databricks-unity-catalog/SKILL.md)** — catalog/schema/volume management
+- **databricks-pipelines** — SDP syntax, CDC/SCD patterns, streaming vs materialized views
+- **databricks-dabs** — DAB resource YAML and multi-environment deployment
+- **databricks-unity-catalog** — catalog/schema/volume management
