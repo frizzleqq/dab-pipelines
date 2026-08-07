@@ -7,7 +7,7 @@
 ## Output Structure
 
 ```
-src/transformations/<domain>/
+src/dab_pipelines_etl/<domain>/
   pipeline_config.py          # schema config read from Spark conf
   bronze/
     <source_table>.py         # one file per source table
@@ -26,7 +26,7 @@ Choose the ingestion pattern based on where the source data lives:
 **Pattern A — Source Delta table** (Unity Catalog table as source):
 Use `spark.readStream.table("<source_catalog>.<source_schema>.<table>")`.
 - Table name: `{cfg.bronze_schema}.<source_schema>_<table>` (schema prefix avoids collisions)
-- Add `_loading_ts` column via `.withColumn("_loading_ts", F.current_ts())`
+- Add `_loading_ts` column via `.withColumn("_loading_ts", F.current_timestamp())`
 - `cluster_by` using `_loading_ts` and the most selective / natural key column
 - No transformations — preserve source columns exactly
 

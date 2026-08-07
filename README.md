@@ -30,7 +30,7 @@ This Databricks Asset Bundle expects pre-existing Catalogs, Groups and Service P
 
 ## Unity Catalog Resources
 
-Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](resources/schemas.yml) and [`resources/volumes.yml`](resources/volumes.yml) for definitions and grants. In `dev`, names are prefixed with `dev_<username>_` for per-user isolation; names are fixed in `test` and `prod`.
+Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](resources/schemas.yml) and [`resources/volumes.yml`](resources/volumes.yml) for definitions and grants. In `dev`, names are prefixed with `dev_<username>_` for per-user isolation; in `test`, names are prefixed with `test_`; names are fixed in `prod`.
 
 ## Development
 
@@ -38,7 +38,10 @@ Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](
 
 * uv: https://docs.astral.sh/uv/getting-started/installation/
 * Databricks CLI: https://docs.databricks.com/aws/en/dev-tools/cli/install
-* (Optional) ai-dev-kit: https://github.com/databricks-solutions/ai-dev-kit
+* (Optional) Databricks AI skills for your coding agent (installable via Databricks CLI):
+  ```bash
+  databricks aitools install
+  ```
 
 ### Getting started
 

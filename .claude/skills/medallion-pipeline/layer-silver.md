@@ -7,7 +7,7 @@
 ## Output Structure
 
 ```
-src/transformations/<domain>/
+src/dab_pipelines_etl/<domain>/
   silver/
     <dim|fact_name>.py        # SCD dimensions and fact streaming tables
 ```
@@ -31,9 +31,9 @@ File: `silver/<dim_name>_h.py`
 Pattern: `@dp.temporary_view` for the source join → `dp.create_streaming_table` + `dp.create_auto_cdc_flow` per target table (see SDP CDC reference).
 
 Project-specific rules:
-- Built the surrogate key (`<dim_prefix>_sk`) as part of the schema definition in `create_auto_cdc_flow` with `<dim_prefix>_sk BIGINT GENERATED ALWAYS AS IDENTITY`
+- Build the surrogate key (`<dim_prefix>_sk`) as part of the schema definition in `create_auto_cdc_flow` with `<dim_prefix>_sk BIGINT GENERATED ALWAYS AS IDENTITY`
 - `sequence_by`: use the source update timestamp; fall back to `_loading_ts` if no timestamp exists in the source
-- `cluster_by` the by natural business keys and the `<dim_prefix>_sk` column for load/read performance
+- `cluster_by` natural business keys and the `<dim_prefix>_sk` column for load/read performance
 - Lookup tables (nation, region, etc.) join as **static** reads (`spark.read.table(...)`) inside the temp view
 
 ### 2. Facts — one file per fact
