@@ -8,6 +8,7 @@ This repo deploys a Databricks Asset Bundle.
   - `src/dab_pipelines/`: Shared Python code for pipelines.
     - `synthetic_data_generator.py`: Generate configurable synthetic test data
   - `src/dab_pipelines_etl/`: Spark Declarative Pipelines, organised by domain and medallion layer
+    - `<domain>/tests/`: Pipeline unit tests (Beta), executed by the Databricks pipeline runtime
 - `resources/`: Resource configurations (jobs, pipelines, UC schemas, volumes, alerts)
 - `tests/`: Unit tests for the shared Python code.
 
@@ -15,7 +16,9 @@ This repo deploys a Databricks Asset Bundle.
 - Install deps: `uv sync --locked`
 - Run code checks: `uv run ruff check --fix`
 - Check code formatting: `uv run ruff format`
-- Run tests: `uv run pytest -v`
+- Run tests: `uv run pytest -v` (scoped to `tests/` — pipeline unit tests are not collected locally)
+- Pipeline unit tests: run from the Lakeflow Pipelines Editor; they import `pyspark.pipelines.testing`,
+  which only exists in the pipeline runtime, so they cannot run under local pytest or databricks-connect
 - Deploy to dev: `databricks bundle deploy`
   - For target `dev` deployed jobs are prefixed with `[dev_${workspace.current_user.short_name}]`
 

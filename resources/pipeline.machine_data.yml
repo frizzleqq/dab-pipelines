@@ -15,6 +15,9 @@ resources:
             include: ../src/dab_pipelines_etl/machine_data/**
 
       configuration:
+        # catalog is also a pipeline setting, but pipeline code (and pipeline unit
+        # tests, which need fully qualified table names) can only read configuration.
+        catalog: ${var.catalog}
         bronze_schema: ${resources.schemas.schema_bronze.name}
         silver_schema: ${resources.schemas.schema_silver.name}
         gold_schema: ${resources.schemas.schema_gold.name}
