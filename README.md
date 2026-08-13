@@ -30,7 +30,7 @@ This Databricks Asset Bundle expects pre-existing Catalogs, Groups and Service P
 
 ## Unity Catalog Resources
 
-Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](resources/schemas.yml) and [`resources/volumes.yml`](resources/volumes.yml) for definitions and grants. In `dev`, names are prefixed with `dev_<username>_` for per-user isolation; in `test`, names are prefixed with `test_`; names are fixed in `prod`.
+Schemas and volumes are managed by the bundle — see [`resources/schemas.yml`](resources/schemas.yml) and [`resources/volumes.yml`](resources/volumes.yml) for definitions and grants. In `dev`, names are prefixed with `dev_<username>_` for per-user isolation; names are fixed in `test` and `prod`, which are isolated from each other by catalog (`lake_test` vs `lake_prod`).
 
 ## Development
 
