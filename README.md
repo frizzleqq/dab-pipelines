@@ -64,49 +64,25 @@ uv run pytest -v
 
 ### Pipeline unit tests (Beta)
 
-Besides the local tests in `tests/`, the pipeline transformations themselves are tested
-with the Databricks *pipeline unit testing* feature (Beta). These tests mock a pipeline's
-source tables, run a subset of the pipeline graph against the mocks, and assert on the
-resulting tables — so the actual `@dp.table` definitions are exercised, decorators,
-expectations and declared schemas included.
+Besides the local tests in `tests/`, the pipeline transformations are tested with the
+Databricks *pipeline unit testing* feature (Beta): tests mock the pipeline's source
+tables, run a subset of the pipeline graph, and assert on the resulting tables — so the
+actual `@dp.table` definitions are exercised, expectations and declared schemas included.
+Mocked tables are written to a redirected test catalog, so real data is never touched.
+See [`src/dab_pipelines_etl/machine_data/tests/`](src/dab_pipelines_etl/machine_data/tests/)
+for examples.
 
-Example: [`src/dab_pipelines_etl/machine_data/tests/test_dim_machine_a.py`](src/dab_pipelines_etl/machine_data/tests/test_dim_machine_a.py)
-covers the gold `dim_machine_a` table, which filters the silver SCD Type 2 history down
-to the currently active version of each machine.
+Wiring (see [`resources/pipeline.machine_data.yml`](resources/pipeline.machine_data.yml)):
 
-```python
-from pyspark.pipelines.testing import TestPipeline, test_spark
+* Test files live under the pipeline's `root_path` but are **excluded from the source
+  globs** — the runtime rejects test files as pipeline source.
+* The pipeline runs on the **PREVIEW channel**, required by the Beta.
+* The catalog is exposed as a `configuration` value (read in `pipeline_config.py`)
+  because tests reference tables by fully qualified name.
 
-test_pipeline = TestPipeline.active()
-
-
-def test_only_active_versions_are_kept(test_spark):
-    mock_dim_machine_h(test_spark)                 # CREATE OR REPLACE TABLE <catalog>.<silver>.dim_machine_h ...
-    test_pipeline.run(test_spark, {DIM_MACHINE_A}) # run only this table
-    ...
-```
-
-How this is wired up:
-
-* Test files live **inside the pipeline's source glob** (`libraries.glob` in
-  [`resources/pipeline.machine_data.yml`](resources/pipeline.machine_data.yml)) so they are
-  deployed with the pipeline. The runtime picks them up as tests — not as dataset
-  definitions — via pytest naming conventions (`test_*.py`).
-* Tables are referenced by their **fully qualified** name. The pipeline's catalog is
-  therefore exposed to pipeline code as a `configuration` value and read in
-  `pipeline_config.py`, next to the existing schema names.
-* Mocked tables are written to a redirected test catalog, so running the tests never
-  touches real data.
-
-Running them:
-
-* From the Lakeflow Pipelines Editor in the workspace ("Run tests").
-* They are **not** run by `uv run pytest`: `pyspark.pipelines.testing` ships only in the
-  Databricks pipeline runtime, not in `databricks-connect`. Local pytest is scoped to
-  `tests/` via `testpaths` in `pyproject.toml`, so it skips them instead of failing on the
-  import.
-
-> The feature is in Beta and must be enabled for the workspace; the API may still change.
+Run them from the Lakeflow Pipelines Editor ("Run tests") — the only supported way;
+there is no CLI/API trigger. Local `uv run pytest` skips them (`testpaths = ["tests"]`
+in `pyproject.toml`), since `pyspark.pipelines.testing` only exists in the pipeline runtime.
 
 
 # Using this project using the CLI

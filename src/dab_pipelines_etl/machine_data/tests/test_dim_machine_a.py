@@ -1,16 +1,10 @@
 """Pipeline unit tests for the gold ``dim_machine_a`` table (Beta feature).
 
-These tests are executed by the Databricks pipeline runtime, not by local
-``pytest``: ``pyspark.pipelines.testing`` is only available inside the pipeline
-runtime, so this module cannot be imported by ``uv run pytest`` (which is
-scoped to ``tests/`` via ``[tool.pytest.ini_options] testpaths``).
-
-Run them from the Lakeflow Pipelines Editor ("Run tests") or by starting an
-update of ``pipeline_machine_data`` in test mode.
+Runs only inside the Databricks pipeline runtime (Lakeflow Pipelines Editor >
+"Run tests"), not under local pytest. See "Pipeline unit tests" in README.md.
 
 ``test_pipeline.run()`` executes only the requested subset of the pipeline
-graph; every upstream table it reads must be mocked first. Mocked tables are
-written to a redirected test catalog, so real data is never touched.
+graph; every upstream table it reads must be mocked first.
 """
 
 from pyspark.pipelines.testing import TestPipeline, test_spark  # noqa: F401

@@ -16,9 +16,8 @@ This repo deploys a Databricks Asset Bundle.
 - Install deps: `uv sync --locked`
 - Run code checks: `uv run ruff check --fix`
 - Check code formatting: `uv run ruff format`
-- Run tests: `uv run pytest -v` (scoped to `tests/` — pipeline unit tests are not collected locally)
-- Pipeline unit tests: run from the Lakeflow Pipelines Editor; they import `pyspark.pipelines.testing`,
-  which only exists in the pipeline runtime, so they cannot run under local pytest or databricks-connect
+- Run tests: `uv run pytest -v` (scoped to `tests/`)
+- Pipeline unit tests (`src/dab_pipelines_etl/<domain>/tests/`): runnable only from the Lakeflow Pipelines Editor, not via local pytest or CLI
 - Deploy to dev: `databricks bundle deploy`
   - For target `dev` deployed jobs are prefixed with `[dev_${workspace.current_user.short_name}]`
 
