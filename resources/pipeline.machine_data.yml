@@ -7,14 +7,24 @@ resources:
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true
+      # Required by pipeline unit tests (Beta)
+      channel: PREVIEW
       # The root path is useful during development in pipeline editor (but dependencies is preferred)
       root_path: "../src"
 
+      # tests/ must not be pipeline source (the editor finds it via root_path);
+      # pipeline_config.py is imported via the environment, not as source.
       libraries:
         - glob:
-            include: ../src/dab_pipelines_etl/machine_data/**
+            include: ../src/dab_pipelines_etl/machine_data/bronze/**
+        - glob:
+            include: ../src/dab_pipelines_etl/machine_data/silver/**
+        - glob:
+            include: ../src/dab_pipelines_etl/machine_data/gold/**
 
       configuration:
+        # expose catalog to pipeline code; unit tests need fully qualified names
+        catalog: ${var.catalog}
         bronze_schema: ${resources.schemas.schema_bronze.name}
         silver_schema: ${resources.schemas.schema_silver.name}
         gold_schema: ${resources.schemas.schema_gold.name}

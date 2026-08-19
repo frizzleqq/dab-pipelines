@@ -8,6 +8,7 @@ The data is generated using `faker`.
   * `src/dab_pipelines_etl/`: Spark Declarative pipelines organised by domain and medallion layer.
 * `resources/`: Resource configurations (jobs, pipelines, UC schemas, volumes, alerts)
 * `tests/`: Unit tests for the shared Python code.
+* `src/dab_pipelines_etl/<domain>/tests/`: Pipeline unit tests, run by the pipeline runtime (see below).
 
 
 ## Data Generation
@@ -60,6 +61,28 @@ uv run ruff format
 # Tests
 uv run pytest -v
 ```
+
+### Pipeline unit tests (Beta)
+
+Besides the local tests in `tests/`, the pipeline transformations are tested with the
+Databricks *pipeline unit testing* feature (Beta): tests mock the pipeline's source
+tables, run a subset of the pipeline graph, and assert on the resulting tables — so the
+actual `@dp.table` definitions are exercised, expectations and declared schemas included.
+Mocked tables are written to a redirected test catalog, so real data is never touched.
+See [`src/dab_pipelines_etl/machine_data/tests/`](src/dab_pipelines_etl/machine_data/tests/)
+for examples.
+
+Wiring (see [`resources/pipeline.machine_data.yml`](resources/pipeline.machine_data.yml)):
+
+* Test files live under the pipeline's `root_path` but are **excluded from the source
+  globs** — the runtime rejects test files as pipeline source.
+* The pipeline runs on the **PREVIEW channel**, required by the Beta.
+* The catalog is exposed as a `configuration` value (read in `pipeline_config.py`)
+  because tests reference tables by fully qualified name.
+
+Run them from the Lakeflow Pipelines Editor ("Run tests") — the only supported way;
+there is no CLI/API trigger. Local `uv run pytest` skips them (`testpaths = ["tests"]`
+in `pyproject.toml`), since `pyspark.pipelines.testing` only exists in the pipeline runtime.
 
 
 # Using this project using the CLI
