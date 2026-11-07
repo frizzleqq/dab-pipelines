@@ -57,7 +57,8 @@ instead it is read from the git-ignored `databricks.local.yml` (included by `dat
 cp databricks.local.yml.example databricks.local.yml
 # then set workspace.host to your workspace URL
 ```
-The host defined there is the default for all targets. Without this file, the Databricks CLI
+The host defined there is the default for all targets. The example also contains a commented-out
+override of the `catalog` variable per target (e.g. to deploy `dev` into a different catalog). Without this file, the Databricks CLI
 falls back to the `DATABRICKS_HOST` environment variable or the `DEFAULT` profile in `~/.databrickscfg`.
 
 ### CI/CD (GitHub Actions)
