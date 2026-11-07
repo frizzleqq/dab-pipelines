@@ -22,6 +22,9 @@ variables:
 include:
   - resources/*.yml
   - resources/*/*.yml
+  # Optional, git-ignored local overrides (e.g. the workspace host), see databricks.local.yml.example.
+  # Glob pattern, so the bundle still loads when the file does not exist (e.g. in CI).
+  - databricks.local.y*ml
 
 artifacts:
   python_artifact:
@@ -45,8 +48,6 @@ targets:
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
     mode: development
     default: true
-    workspace:
-      host: https://dbc-ea4bb8e5-6935.cloud.databricks.com
     variables:
       catalog: lake_dev
       schema: ${workspace.current_user.short_name}
@@ -57,7 +58,6 @@ targets:
     presets:
       trigger_pause_status: PAUSED
     workspace:
-      host: https://dbc-ea4bb8e5-6935.cloud.databricks.com
       root_path: /Workspace/bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lake_test
@@ -74,7 +74,6 @@ targets:
     presets:
       trigger_pause_status: UNPAUSED
     workspace:
-      host: https://dbc-ea4bb8e5-6935.cloud.databricks.com
       root_path: /Workspace/bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lake_prod

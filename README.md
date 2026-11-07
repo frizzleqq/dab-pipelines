@@ -51,6 +51,21 @@ Sync `uv` environment:
 uv sync
 ```
 
+Configure the Databricks workspace host locally. The host is not committed in `databricks.yml`;
+instead it is read from the git-ignored `databricks.local.yml` (included by `databricks.yml`):
+```bash
+cp databricks.local.yml.example databricks.local.yml
+# then set workspace.host to your workspace URL
+```
+The host defined there is the default for all targets. Without this file, the Databricks CLI
+falls back to the `DATABRICKS_HOST` environment variable or the `DEFAULT` profile in `~/.databrickscfg`.
+
+### CI/CD (GitHub Actions)
+
+The workflows in `.github/workflows/` do not use `databricks.local.yml`. They authenticate via
+the repository/environment secrets `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID` and
+`DATABRICKS_CLIENT_SECRET` (service principal OAuth), and the bundle picks up the host from `DATABRICKS_HOST`.
+
 ### Checks
 
 ```bash
