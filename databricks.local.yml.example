@@ -1,0 +1,15 @@
+# Local, git-ignored overrides for the Databricks Asset Bundle.
+# Copy this file to `databricks.local.yml` and adjust the values:
+#   cp databricks.local.yml.example databricks.local.yml
+#
+# The workspace host set here is the default for all targets.
+# Without this file, the host is resolved from the DATABRICKS_HOST environment
+# variable or the DEFAULT profile in ~/.databrickscfg (as done in CI).
+workspace:
+  host: https://<your-workspace>.cloud.databricks.com
+
+# Optional: override the catalog for local deployments to a target (default for dev: lake_dev).
+# targets:
+#   dev:
+#     variables:
+#       catalog: my_catalog

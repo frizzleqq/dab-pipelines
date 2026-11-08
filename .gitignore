@@ -11,6 +11,10 @@ scratch/**
 **/!explorations/README.md
 data_output/
 
+# Local bundle overrides (see databricks.local.yml.example)
+databricks.local.yml
+databricks.local.yaml
+
 # AI tooling
 .claude/*
 !.claude/skills/

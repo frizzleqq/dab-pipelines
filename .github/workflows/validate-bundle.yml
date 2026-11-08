@@ -16,6 +16,7 @@ jobs:
       matrix:
         python-version: ["3.12"]
     env:
+      # Workspace host is not set in databricks.yml (local: databricks.local.yml), so it comes from this secret
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
       DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}

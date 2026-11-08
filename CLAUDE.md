@@ -4,6 +4,7 @@ This repo deploys a Databricks Asset Bundle.
 
 ## Project Structure
 - `databricks.yml`: Databricks Asset Bundle configuration file
+- `databricks.local.yml`: git-ignored local overrides (workspace host), copy from `databricks.local.yml.example`; CI uses the `DATABRICKS_HOST` secret instead
 - `src/`: Python source code
   - `src/dab_pipelines/`: Shared Python code for pipelines.
     - `synthetic_data_generator.py`: Generate configurable synthetic test data
